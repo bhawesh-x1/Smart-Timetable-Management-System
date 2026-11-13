@@ -1,0 +1,3750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Timetable Management System • v1.0.0 College Edition (PIET)</title>
+    <style>
+        :root {
+            --sidebar-bg: #1A2234;
+            --sidebar-text: #94A3B8;
+            --sidebar-footer: #64748B;
+            --primary-blue: #1E6BF1;
+            --primary-blue-hover: #1557CC;
+            --emerald-green: #10B981;
+            --emerald-hover: #059669;
+            --cyan-blue: #0EA5E9;
+            --amber-orange: #F59E0B;
+            --vivid-purple: #8B5CF6;
+            --coral-red: #EF4444;
+            --slate-gray: #64748B;
+            --row-select-bg: #DBEAFE;
+            --row-select-text: #1E40AF;
+            --bg-main: #F1F5F9;
+            --card-bg: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 1.1 GLOBAL APPLICATION SHELL - LEFT SIDEBAR (250px fixed width, #1A2234) */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            user-select: none;
+        }
+
+        .brand-header {
+            padding: 18px 20px 14px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            line-height: 1.2;
+        }
+
+        .brand-subtitle {
+            font-size: 13px;
+            color: #94A3B8;
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .nav-list {
+            flex: 1;
+            padding: 10px 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 9px 12px;
+            border-radius: 6px;
+            color: #94A3B8;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.06);
+            color: #E2E8F0;
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-blue);
+            color: #FFFFFF;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(30, 107, 241, 0.35);
+        }
+
+        .nav-item svg {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .sidebar-footer {
+            padding: 12px 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 11px;
+            color: var(--sidebar-footer);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        /* MAIN WORKSPACE CONTAINER */
+        .main-wrapper {
+            margin-left: 250px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* TOP HEADER BAR (White #FFFFFF, bottom border 1px solid #E2E8F0) */
+        .top-header {
+            min-height: 68px;
+            height: auto;
+            background-color: #FFFFFF;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            gap: 14px;
+            row-gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1 1 auto;
+            flex-wrap: wrap;
+        }
+
+        .page-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: #0F172A;
+            text-transform: uppercase;
+            letter-spacing: 0.25px;
+            white-space: nowrap;
+        }
+
+        .ay-badge {
+            background-color: #EBF3FF;
+            border: 1px solid #BFDBFE;
+            color: #1E6BF1;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .mode-switcher, .role-switcher, .sem-switcher {
+            height: 34px;
+            padding: 0 9px;
+            border-radius: 6px;
+            border: 1px solid #CBD5E1;
+            background-color: #F8FAFC;
+            color: #0F172A;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            max-width: 215px;
+            text-overflow: ellipsis;
+        }
+
+        .sem-switcher {
+            background-color: #F5F3FF;
+            border-color: #DDD6FE;
+            color: #5B21B6;
+            font-weight: 700;
+            max-width: 175px;
+        }
+
+        .mode-switcher {
+            background-color: #EEF2FF;
+            border-color: #C7D2FE;
+            color: #3730A3;
+        }
+
+        .mode-switcher:focus, .role-switcher:focus, .sem-switcher:focus {
+            border-color: var(--primary-blue);
+        }
+
+        /* BUTTON PALETTE */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 36px;
+            padding: 0 14px;
+            border-radius: 6px;
+            border: none;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            color: #FFFFFF;
+        }
+
+        .btn:hover {
+            filter: brightness(0.94);
+            transform: translateY(-0.5px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary { background-color: var(--primary-blue); }
+        .btn-emerald { background-color: var(--emerald-green); }
+        .btn-cyan    { background-color: var(--cyan-blue); }
+        .btn-amber   { background-color: var(--amber-orange); }
+        .btn-purple  { background-color: var(--vivid-purple); }
+        .btn-danger  { background-color: var(--coral-red); }
+        .btn-slate   { background-color: var(--slate-gray); }
+        .btn-outline {
+            background-color: #FFFFFF;
+            color: #334155;
+            border: 1px solid #CBD5E1;
+        }
+        .btn-sm {
+            height: 30px;
+            padding: 0 10px;
+            font-size: 11.5px;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            padding: 22px 24px 36px 24px;
+            flex: 1;
+        }
+
+        /* 6 KPI SUMMARY CARDS (ADMIN DASHBOARD OVERVIEW) */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .kpi-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 16px 16px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: box-shadow 0.15s ease;
+            min-height: 100px;
+        }
+
+        .kpi-card:hover {
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-blue);
+        }
+
+        .kpi-card.emerald::before { background: var(--emerald-green); }
+        .kpi-card.cyan::before    { background: var(--cyan-blue); }
+        .kpi-card.amber::before   { background: var(--amber-orange); }
+        .kpi-card.purple::before  { background: var(--vivid-purple); }
+        .kpi-card.danger::before  { background: var(--coral-red); }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0F172A;
+            margin-top: 8px;
+            line-height: 1;
+        }
+
+        .kpi-card.danger .kpi-value {
+            color: #DC2626;
+        }
+
+        .kpi-sub {
+            font-size: 11px;
+            color: #94A3B8;
+            margin-top: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* QUICK ACTIONS BAR */
+        .quick-actions-bar {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            row-gap: 10px;
+        }
+
+        .quick-actions-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            row-gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            margin-right: 4px;
+        }
+
+        /* PANEL / TABLE CARD */
+        .panel-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .panel-toolbar {
+            padding: 14px 18px;
+            border-bottom: 1px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            row-gap: 12px;
+            background: #FCFDFE;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            row-gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            row-gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .panel-heading {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0F172A;
+        }
+
+        .search-input, .filter-select {
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #0F172A;
+            background: #FFFFFF;
+            outline: none;
+        }
+
+        .search-input {
+            min-width: 230px;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(30, 107, 241, 0.12);
+        }
+
+        /* DATA TABLES & ROW-SELECTION PATTERN */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        table.data-table thead th {
+            background-color: #F8FAFC;
+            color: #475569;
+            font-weight: 700;
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 11px 14px;
+            text-align: left;
+            border-bottom: 1px solid #E2E8F0;
+            white-space: nowrap;
+        }
+
+        table.data-table tbody td {
+            padding: 11px 14px;
+            border-bottom: 1px solid #F1F5F9;
+            color: #1E293B;
+            vertical-align: middle;
+        }
+
+        table.data-table tbody tr {
+            cursor: pointer;
+            transition: background-color 0.1s ease;
+        }
+
+        table.data-table tbody tr:hover {
+            background-color: #F8FAFC;
+        }
+
+        /* Exact Row-Selection Highlight from Screenshot 5 (bg: #DBEAFE, text: #1E40AF) */
+        table.data-table tbody tr.selected-row {
+            background-color: var(--row-select-bg) !important;
+            color: var(--row-select-text) !important;
+            font-weight: 600;
+        }
+
+        table.data-table tbody tr.selected-row td {
+            color: var(--row-select-text) !important;
+            border-bottom-color: #BFDBFE;
+        }
+
+        table.data-table tbody tr.conflict-row {
+            background-color: #FEF2F2;
+        }
+
+        /* BADGES & PILLS */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+
+        .badge-blue    { background: #DBEAFE; color: #1E40AF; }
+        .badge-emerald { background: #D1FAE5; color: #065F46; }
+        .badge-amber   { background: #FEF3C7; color: #92400E; }
+        .badge-purple  { background: #EDE9FE; color: #5B21B6; }
+        .badge-cyan    { background: #CFFAFE; color: #155E75; }
+        .badge-red     { background: #FEE2E2; color: #991B1B; }
+        .badge-slate   { background: #E2E8F0; color: #334155; }
+
+        /* TIMETABLE & REPORTS SUB-TABS (COLLISION-FREE SINGLE-ROW SEGMENTED CONTROL) */
+        .subtab-bar {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            row-gap: 6px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            background: #E2E8F0;
+            padding: 4px;
+            border-radius: 8px;
+            max-width: 100%;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .subtab-btn {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+            outline: none;
+        }
+
+        .subtab-btn:hover {
+            color: #0F172A;
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .subtab-btn.active {
+            background: #FFFFFF;
+            color: var(--primary-blue);
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+        }
+
+        .subtab-badge {
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-weight: 700;
+            background: #CBD5E1;
+            color: #334155;
+            letter-spacing: 0.15px;
+        }
+
+        .subtab-btn.active .subtab-badge {
+            background: #EBF3FF;
+            color: var(--primary-blue);
+        }
+
+        .subtab-badge.danger {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        /* WEEKLY TIMETABLE GRID (WITH STICKY DAY/PERIOD COLUMN) */
+        .tt-grid-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+            min-width: 960px;
+        }
+
+        .tt-grid-table th {
+            background: #1A2234;
+            color: #FFFFFF;
+            padding: 9px 7px;
+            font-size: 11px;
+            text-align: center;
+            border-right: 1px solid #2D3748;
+            border-bottom: 1px solid #2D3748;
+        }
+
+        .tt-grid-table th.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 6;
+            box-shadow: 2px 0 6px rgba(15, 23, 42, 0.18);
+        }
+
+        .tt-grid-table th.break-col {
+            width: 66px;
+            background: #334155;
+        }
+
+        .tt-grid-table td.day-cell {
+            position: sticky;
+            left: 0;
+            z-index: 4;
+            background: #F8FAFC;
+            font-weight: 800;
+            font-size: 12px;
+            color: #0F172A;
+            text-align: center;
+            border-right: 1px solid #CBD5E1;
+            border-bottom: 1px solid #E2E8F0;
+            width: 105px;
+            padding: 8px 6px;
+            box-shadow: 2px 0 5px rgba(15, 23, 42, 0.06);
+        }
+
+        .tt-grid-table td.break-cell {
+            background: #F1F5F9;
+            color: #64748B;
+            font-weight: 700;
+            font-size: 10.5px;
+            text-align: center;
+            border-right: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 1.5px;
+        }
+
+        .tt-grid-table td.slot-cell {
+            border-right: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
+            vertical-align: top;
+            padding: 6px;
+            min-height: 106px;
+            height: auto;
+            background: #FFFFFF;
+            transition: background 0.12s;
+        }
+
+        .tt-grid-table td.slot-cell.drag-over {
+            background: #EDE9FE !important;
+            outline: 2px dashed #8B5CF6;
+            outline-offset: -2px;
+        }
+
+        /* AUTO-GENERATOR STUDIO */
+        .gen-studio-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+        @media (max-width: 980px) {
+            .gen-studio-grid { grid-template-columns: 1fr; }
+        }
+        .gen-config-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        }
+        .gen-checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0 16px 0;
+        }
+        .gen-check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #334155;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .gen-step-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .gen-step-pill {
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+            background: #F1F5F9;
+            color: #64748B;
+            border: 1px solid #E2E8F0;
+            transition: all 0.2s ease;
+        }
+        .gen-step-pill.running {
+            background: #EDE9FE;
+            color: #6D28D9;
+            border-color: #C4B5FD;
+        }
+        .gen-step-pill.done {
+            background: #D1FAE5;
+            color: #065F46;
+            border-color: #A7F3D0;
+        }
+
+        .tt-grid-table td.slot-cell:hover {
+            background: #F8FAFC;
+        }
+
+        .slot-card {
+            border-radius: 6px;
+            padding: 7px 9px;
+            margin-bottom: 6px;
+            font-size: 11.5px;
+            border-left: 4px solid #1E6BF1;
+            background: #EFF6FF;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            box-sizing: border-box;
+            word-break: break-word;
+        }
+
+        .slot-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .slot-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.1);
+        }
+
+        .slot-card.theme-blue    { background: #EFF6FF; border-left-color: #1E6BF1; color: #1E3A8A; }
+        .slot-card.theme-cyan    { background: #ECFEFF; border-left-color: #0EA5E9; color: #164E63; }
+        .slot-card.theme-emerald { background: #ECFDF5; border-left-color: #10B981; color: #064E3B; }
+        .slot-card.theme-amber   { background: #FFFBEB; border-left-color: #F59E0B; color: #78350F; }
+        .slot-card.theme-purple  { background: #F5F3FF; border-left-color: #8B5CF6; color: #4C1D95; }
+        .slot-card.theme-indigo  { background: #EEF2FF; border-left-color: #6366F1; color: #312E81; }
+        .slot-card.theme-rose    { background: #FFF1F2; border-left-color: #F43F5E; color: #881337; }
+        .slot-card.theme-slate   { background: #F8FAFC; border-left-color: #64748B; color: #334155; }
+
+        .slot-card.conflict-card {
+            background: #FEF2F2 !important;
+            border: 1.5px solid #EF4444 !important;
+            border-left: 5px solid #DC2626 !important;
+            color: #991B1B !important;
+        }
+
+        .slot-code-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .slot-title-line {
+            font-weight: 600;
+            font-size: 11px;
+            line-height: 1.25;
+            margin-bottom: 4px;
+        }
+
+        .slot-meta-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10.5px;
+            opacity: 0.9;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .room-pill {
+            background: rgba(15, 23, 42, 0.08);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .empty-slot-btn {
+            width: 100%;
+            height: 100%;
+            min-height: 76px;
+            border: 1px dashed #CBD5E1;
+            border-radius: 6px;
+            background: transparent;
+            color: #94A3B8;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .empty-slot-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: #F8FAFC;
+        }
+
+        /* PROGRESS BARS FOR ROOM UTILIZATION (SCREENSHOT 10) */
+        .progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 150px;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 8px;
+            background: #E2E8F0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: var(--primary-blue);
+        }
+
+        .progress-fill.moderate { background: #F59E0B; }
+        .progress-fill.optimal  { background: #10B981; }
+        .progress-fill.low      { background: #3B82F6; }
+
+        /* MODAL DIALOG */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #FFFFFF;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 560px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+            overflow: hidden;
+            animation: modalIn 0.15s ease-out;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-header {
+            background: #1A2234;
+            color: #FFFFFF;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94A3B8;
+            font-size: 20px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .form-control {
+            height: 38px;
+            padding: 0 11px;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #0F172A;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(30, 107, 241, 0.15);
+        }
+
+        .modal-footer {
+            padding: 14px 20px;
+            background: #F8FAFC;
+            border-top: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast-container {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: #1A2234;
+            color: #FFFFFF;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+            border-left: 4px solid var(--emerald-green);
+            max-width: 420px;
+        }
+
+        @media print {
+            .sidebar, .top-header .header-right, .quick-actions-bar, .no-print {
+                display: none !important;
+            }
+            .main-wrapper {
+                margin-left: 0 !important;
+            }
+            body {
+                background: #FFFFFF;
+            }
+        }
+
+        .signout-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(145deg, #0B1220 0%, #1A2234 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+        .signout-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+    </style>
+    <script>
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('demo') === '1') return;
+            const rawAuth = sessionStorage.getItem('smartcampus_auth') || localStorage.getItem('smartcampus_auth');
+            if (!rawAuth) {
+                const target = window.location.pathname + window.location.search;
+                window.location.replace('/login?redirect=' + encodeURIComponent(target === '/login' ? '/dashboard' : target));
+            }
+        })();
+    </script>
+</head>
+<body>
+
+    <!-- 1.1 LEFT SIDEBAR (250px fixed width, Dark Navy #1A2234, 12 Navigation Links with Clean Inline SVGs) -->
+    <aside class="sidebar">
+        <div class="brand-header">
+            <div class="brand-title">SMART CAMPUS</div>
+            <div class="brand-subtitle">Timetable System</div>
+        </div>
+
+        <nav class="nav-list" id="sidebarNav">
+            <a class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-item" data-tab="students" onclick="switchTab('students')">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Students</span>
+            </a>
+            <a class="nav-item" data-tab="faculty" onclick="switchTab('faculty')">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Faculty</span>
+            </a>
+            <a class="nav-item" data-tab="departments" onclick="switchTab('departments')">
+                <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/></svg>
+                <span>Departments</span>
+            </a>
+            <a class="nav-item" data-tab="courses" onclick="switchTab('courses')">
+                <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                <span>Courses</span>
+            </a>
+            <a class="nav-item" data-tab="subjects" onclick="switchTab('subjects')">
+                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                <span>Subjects</span>
+            </a>
+            <a class="nav-item" data-tab="rooms" onclick="switchTab('rooms')">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Rooms &amp; Labs</span>
+            </a>
+            <a class="nav-item" data-tab="timeslots" onclick="switchTab('timeslots')">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Time Slots</span>
+            </a>
+            <a class="nav-item" data-tab="timetable" onclick="switchTab('timetable')">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>Timetable (Sem 1-8)</span>
+            </a>
+            <a class="nav-item" data-tab="autogenerator" onclick="switchTab('autogenerator')">
+                <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>Auto-Generator Studio</span>
+            </a>
+            <a class="nav-item" data-tab="reports" onclick="switchTab('reports')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Reports &amp; Analytics</span>
+            </a>
+            <a class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Settings</span>
+            </a>
+            <a class="nav-item" data-tab="logout" onclick="triggerLogoutModal()">
+                <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Logout</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>v1.0.0 • College Edition</span>
+            <span style="color:#38BDF8;font-weight:700;">PIET CSE</span>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT SHELL -->
+    <div class="main-wrapper">
+        <!-- TOP HEADER BAR (68px height) -->
+        <header class="top-header">
+            <div class="header-left">
+                <h1 class="page-title" id="dynamicPageTitle">ADMIN DASHBOARD OVERVIEW</h1>
+                <select class="sem-switcher" id="semesterFilterSelect" onchange="handleSemesterChange(this.value)" title="Select Academic Semester (Sem 1 to Sem 8)">
+                    <option value="ALL">All Semesters (Sem 1–8)</option>
+                    <option value="Sem 1">Semester 1 (1CSA)</option>
+                    <option value="Sem 2">Semester 2 (2CSA)</option>
+                    <option value="Sem 3">Semester 3 (3CSA–3CSRD)</option>
+                    <option value="Sem 4">Semester 4 (4CSA)</option>
+                    <option value="Sem 5">Semester 5 (5CSA)</option>
+                    <option value="Sem 6">Semester 6 (6CSA)</option>
+                    <option value="Sem 7">Semester 7 (7CSA)</option>
+                    <option value="Sem 8">Semester 8 (Project/Intern)</option>
+                </select>
+                <span class="ay-badge">AY 2026-2027</span>
+            </div>
+
+            <div class="header-right">
+                <!-- Dual-Dataset Mode Switcher -->
+                <select class="mode-switcher" id="datasetModeSelect" onchange="handleModeSwitch(this.value)" title="Switch between UI Screenshot Demo Dataset and PIET Sem 1-8 Master Dataset">
+                    <option value="MODE_A">Mode A: UI Screenshots (90)</option>
+                    <option value="MODE_B">Mode B: PIET Sem 1–8 (309+)</option>
+                </select>
+
+                <!-- Interactive User Role Switcher -->
+                <select class="role-switcher" id="userRoleSelect" onchange="handleRoleSwitch(this.value)" title="Switch Active User Role">
+                    <option value="ADMIN">System Administrator (ADMIN)</option>
+                    <option value="FACULTY_RV">Dr. Rajesh Verma (FACULTY)</option>
+                    <option value="FACULTY_VK">Dr. Varsha Kumari (FACULTY)</option>
+                    <option value="STUDENT_BS">Bhawesh Sharma (STUDENT - 3CSA A1)</option>
+                </select>
+
+                <!-- Coral Red Logout Button -->
+                <button class="btn btn-danger" onclick="triggerLogoutModal()">Logout</button>
+            </div>
+        </header>
+
+        <!-- DYNAMIC PAGE VIEWPORT -->
+        <main class="content-area" id="mainViewport">
+            <!-- Populated dynamically via JS state renderer -->
+        </main>
+    </div>
+
+    <!-- UNIVERSAL CRUD & SLOT MODAL -->
+    <div class="modal-backdrop" id="crudModalBackdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title" id="crudModalTitle">Modal Title</div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="crudModalForm" onsubmit="submitModalForm(event)">
+                <div class="modal-body" id="crudModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-slate" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="crudModalSubmitBtn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SIGN OUT ANIMATED OVERLAY -->
+    <div class="signout-overlay" id="signoutOverlay">
+        <div style="font-size:20px;font-weight:800;letter-spacing:0.04em;margin-bottom:6px;">SMART CAMPUS</div>
+        <div style="font-size:13.5px;color:#94A3B8;">Signing out cleanly &amp; returning to Login Portal...</div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // =========================================================================
+        // GLOBAL APPLICATION STATE & CONFIGURATION
+        // =========================================================================
+        const APP = {
+            mode: 'MODE_A',
+            role: 'ADMIN',
+            activeTab: 'dashboard',
+            timetableSubTab: 'section',     // 'section' | 'batch' | 'faculty' | 'piet_master'
+            reportsSubTab: 'rooms',         // 'rooms' | 'workload' | 'conflicts'
+            selectedSemester: 'ALL',
+            selectedSection: '3CSA',
+            selectedBatch: 'A1',
+            selectedFaculty: 'Dr. Rajesh Verma',
+            selectedPietDay: 'ALL',
+            searchQuery: '',
+            filterDay: 'ALL',
+            filterSection: 'ALL',
+            genConfig: {
+                targetScope: 'ALL',
+                enforcementLevel: 'STRICT',
+                minimizeGaps: true,
+                balanceLabs: true,
+                respectCapacity: true,
+                enforceMaxLoad: true,
+                previewSemester: 'Sem 3',
+                previewSection: '3CSA',
+                pipelinePhase: 0,
+                dragEntryId: null
+            },
+            selectedRowIds: {
+                students: 1,
+                faculty: 1,
+                departments: 1,
+                courses: 1,
+                subjects: 1,
+                rooms: 1,
+                timeslots: 1
+            },
+            data: {
+                semesters: [],
+                departments: [],
+                courses: [],
+                sections: [],
+                timeSlots: [],
+                students: [],
+                faculty: [],
+                subjects: [],
+                rooms: [],
+                timetableEntries: [],
+                conflicts: [],
+                roomUtilization: [],
+                facultyWorkload: [],
+                generatorPreview: [],
+                generatorMeta: {}
+            },
+            modalContext: null
+        };
+
+        const PAGE_TITLES = {
+            dashboard: 'ADMIN DASHBOARD OVERVIEW',
+            students: 'STUDENT MANAGEMENT',
+            faculty: 'FACULTY MANAGEMENT',
+            departments: 'DEPARTMENT MANAGEMENT',
+            courses: 'COURSE MANAGEMENT',
+            subjects: 'SUBJECT MANAGEMENT',
+            rooms: 'ROOMS & LABS INVENTORY',
+            timeslots: 'TIME SLOT CONFIGURATION',
+            timetable: 'TIMETABLE (SEM 1–8)',
+            autogenerator: '8-SEM AUTO-GENERATOR STUDIO',
+            reports: 'REPORTS & ANALYTICS',
+            settings: 'SYSTEM SETTINGS & CSP ENGINE'
+        };
+
+        // =========================================================================
+        // INITIALIZATION & BACKEND STATE FETCH
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            applyAuthSessionOnBoot();
+            fetchBackendState();
+        });
+
+        function applyAuthSessionOnBoot() {
+            const rawAuth = sessionStorage.getItem('smartcampus_auth') || localStorage.getItem('smartcampus_auth');
+            const pathTab = window.location.pathname.replace(/^\//, '').toLowerCase();
+            if (rawAuth) {
+                try {
+                    const sess = JSON.parse(rawAuth);
+                    APP.authSession = sess;
+                    if (sess.mode === 'MODE_A' || sess.mode === 'MODE_B') {
+                        APP.mode = sess.mode;
+                        const modeEl = document.getElementById('datasetModeSelect');
+                        if (modeEl) modeEl.value = sess.mode;
+                    }
+                    if (sess.role) {
+                        APP.role = sess.role;
+                        const roleSelect = document.getElementById('userRoleSelect');
+                        if (roleSelect) {
+                            let opt = Array.from(roleSelect.options).find(o => o.value === sess.role);
+                            if (!opt) {
+                                opt = document.createElement('option');
+                                opt.value = sess.role;
+                                opt.textContent = sess.roleCategory === 'STUDENT'
+                                    ? `${sess.displayName} (STUDENT - ${sess.studentSection || '3CSA'} ${sess.studentBatch || 'A1'})`
+                                    : `${sess.displayName} (${sess.roleCategory || 'USER'})`;
+                                roleSelect.appendChild(opt);
+                            }
+                            roleSelect.value = sess.role;
+                        }
+                    }
+                    if (sess.roleCategory === 'FACULTY' || (sess.role && sess.role.startsWith('FACULTY'))) {
+                        APP.selectedFaculty = sess.facultyName || (sess.role === 'FACULTY_VK' ? 'Dr. Varsha Kumari' : 'Dr. Rajesh Verma');
+                        APP.timetableSubTab = 'faculty';
+                        APP.activeTab = 'timetable';
+                    } else if (sess.roleCategory === 'STUDENT' || (sess.role && sess.role.startsWith('STUDENT'))) {
+                        APP.selectedSection = sess.studentSection || '3CSA';
+                        APP.selectedBatch = sess.studentBatch || 'A1';
+                        APP.timetableSubTab = 'batch';
+                        APP.activeTab = 'timetable';
+                    }
+                } catch (e) {
+                    console.warn('Invalid stored session:', e);
+                }
+            }
+            if (PAGE_TITLES[pathTab] && pathTab !== 'dashboard') {
+                APP.activeTab = pathTab;
+            }
+            document.querySelectorAll('#sidebarNav .nav-item').forEach(el => {
+                el.classList.toggle('active', el.getAttribute('data-tab') === APP.activeTab);
+            });
+            updateHeaderTitle();
+        }
+
+        async function fetchBackendState() {
+            try {
+                const res = await fetch(`/api/state?mode=${encodeURIComponent(APP.mode)}&semester=${encodeURIComponent(APP.selectedSemester)}`);
+                const json = await res.json();
+                APP.data = json;
+                ensureDefaultSelections();
+                renderCurrentView();
+            } catch (err) {
+                console.error('Failed to load state from backend:', err);
+                showToast('Error connecting to Java Backend Server', true);
+            }
+        }
+
+        function ensureDefaultSelections() {
+            ['students', 'faculty', 'departments', 'courses', 'subjects', 'rooms', 'timeslots'].forEach(type => {
+                const list = getListForEntity(type);
+                if (list && list.length > 0) {
+                    const currentId = APP.selectedRowIds[type];
+                    const exists = list.some(item => Number(item.id) === Number(currentId));
+                    if (!exists) {
+                        APP.selectedRowIds[type] = Number(list[0].id);
+                    }
+                }
+            });
+        }
+
+        function getListForEntity(type) {
+            switch (type) {
+                case 'students': return APP.data.students || [];
+                case 'faculty': return APP.data.faculty || [];
+                case 'departments': return APP.data.departments || [];
+                case 'courses': return APP.data.courses || [];
+                case 'subjects': return APP.data.subjects || [];
+                case 'rooms': return APP.data.rooms || [];
+                case 'timeslots': return APP.data.timeSlots || [];
+                case 'timetable': return APP.data.timetableEntries || [];
+                default: return [];
+            }
+        }
+
+        // =========================================================================
+        // NAVIGATION, MODE SWITCHING & ROLE SWITCHING
+        // =========================================================================
+        function switchTab(tabName) {
+            APP.activeTab = tabName;
+            APP.searchQuery = '';
+            document.querySelectorAll('#sidebarNav .nav-item').forEach(el => {
+                el.classList.toggle('active', el.getAttribute('data-tab') === tabName);
+            });
+            updateHeaderTitle();
+            renderCurrentView();
+        }
+
+        function updateHeaderTitle() {
+            const titleEl = document.getElementById('dynamicPageTitle');
+            if (APP.activeTab === 'timetable' && APP.timetableSubTab === 'faculty') {
+                titleEl.textContent = 'MY TEACHING SCHEDULE';
+            } else {
+                titleEl.textContent = PAGE_TITLES[APP.activeTab] || 'ADMIN DASHBOARD OVERVIEW';
+            }
+        }
+
+        function handleSemesterChange(newSem) {
+            APP.selectedSemester = newSem || 'ALL';
+            const matchingSecs = (APP.data.sections || []).filter(s =>
+                APP.selectedSemester === 'ALL' || s.semester === APP.selectedSemester
+            );
+            if (matchingSecs.length > 0 && !matchingSecs.some(s => s.sectionCode === APP.selectedSection)) {
+                APP.selectedSection = matchingSecs[0].sectionCode;
+            }
+            if (APP.selectedSemester !== 'ALL') {
+                APP.genConfig.previewSemester = APP.selectedSemester;
+            }
+            APP.filterSection = 'ALL';
+            fetchBackendState();
+            showToast(APP.selectedSemester === 'ALL'
+                ? 'Showing All 8 Semesters (Sem 1–Sem 8)'
+                : `Filtered workspace to ${APP.selectedSemester}`);
+        }
+
+        async function handleModeSwitch(newMode) {
+            APP.mode = newMode;
+            await fetchBackendState();
+            const label = newMode === 'MODE_B'
+                ? 'Switched to Mode B: PIET Sem 1–8 Master Dataset (III-Sem 309 Cells + Sem 1–8 Curriculum)'
+                : 'Switched to Mode A: UI Screenshot Demo Dataset (90 Entries • 8 Rooms)';
+            showToast(label);
+        }
+
+        function handleRoleSwitch(newRole) {
+            APP.role = newRole;
+            if (APP.authSession) {
+                APP.authSession.role = newRole;
+                const serialized = JSON.stringify(APP.authSession);
+                if (sessionStorage.getItem('smartcampus_auth')) sessionStorage.setItem('smartcampus_auth', serialized);
+                if (localStorage.getItem('smartcampus_auth')) localStorage.setItem('smartcampus_auth', serialized);
+            }
+            if (newRole === 'FACULTY_RV') {
+                APP.selectedFaculty = 'Dr. Rajesh Verma';
+                APP.timetableSubTab = 'faculty';
+                switchTab('timetable');
+                showToast('Switched to Faculty View: Dr. Rajesh Verma');
+            } else if (newRole === 'FACULTY_VK') {
+                APP.selectedFaculty = 'Dr. Varsha Kumari';
+                APP.timetableSubTab = 'faculty';
+                switchTab('timetable');
+                showToast('Switched to Faculty View: Dr. Varsha Kumari');
+            } else if (newRole === 'FACULTY_CUSTOM' && APP.authSession && APP.authSession.facultyName) {
+                APP.selectedFaculty = APP.authSession.facultyName;
+                APP.timetableSubTab = 'faculty';
+                switchTab('timetable');
+                showToast(`Switched to Faculty View: ${APP.selectedFaculty}`);
+            } else if (newRole === 'STUDENT_BS') {
+                APP.selectedSection = '3CSA';
+                APP.selectedBatch = 'A1';
+                APP.timetableSubTab = 'batch';
+                switchTab('timetable');
+                showToast('Switched to Student View: Bhawesh Sharma (3CSA - Batch A1)');
+            } else if (newRole === 'STUDENT_CUSTOM' && APP.authSession) {
+                APP.selectedSection = APP.authSession.studentSection || '3CSA';
+                APP.selectedBatch = APP.authSession.studentBatch || 'A1';
+                APP.timetableSubTab = 'batch';
+                switchTab('timetable');
+                showToast(`Switched to Student View: ${APP.authSession.displayName || 'Student'} (${APP.selectedSection} - ${APP.selectedBatch})`);
+            } else {
+                switchTab('dashboard');
+                showToast('Switched to System Administrator (ADMIN)');
+            }
+        }
+
+        function selectTableRow(entityType, id) {
+            APP.selectedRowIds[entityType] = Number(id);
+            renderCurrentView();
+        }
+
+        function getSelectedRecord(entityType) {
+            const list = getListForEntity(entityType);
+            const targetId = Number(APP.selectedRowIds[entityType]);
+            return list.find(r => Number(r.id) === targetId) || list[0] || null;
+        }
+
+        // =========================================================================
+        // MAIN VIEW RENDERER
+        // =========================================================================
+        function renderCurrentView() {
+            updateHeaderTitle();
+            const viewport = document.getElementById('mainViewport');
+            switch (APP.activeTab) {
+                case 'dashboard':
+                    viewport.innerHTML = renderDashboardView();
+                    break;
+                case 'students':
+                    viewport.innerHTML = renderStudentsView();
+                    break;
+                case 'faculty':
+                    viewport.innerHTML = renderFacultyView();
+                    break;
+                case 'departments':
+                    viewport.innerHTML = renderDepartmentsView();
+                    break;
+                case 'courses':
+                    viewport.innerHTML = renderCoursesView();
+                    break;
+                case 'subjects':
+                    viewport.innerHTML = renderSubjectsView();
+                    break;
+                case 'rooms':
+                    viewport.innerHTML = renderRoomsView();
+                    break;
+                case 'timeslots':
+                    viewport.innerHTML = renderTimeSlotsView();
+                    break;
+                case 'timetable':
+                    viewport.innerHTML = renderTimetableView();
+                    break;
+                case 'autogenerator':
+                    viewport.innerHTML = renderAutoGeneratorView();
+                    break;
+                case 'reports':
+                    viewport.innerHTML = renderReportsView();
+                    break;
+                case 'settings':
+                    viewport.innerHTML = renderSettingsView();
+                    break;
+                default:
+                    viewport.innerHTML = renderDashboardView();
+            }
+        }
+
+        // =========================================================================
+        // 2.1 ADMIN DASHBOARD OVERVIEW (SCREENSHOT 3)
+        // =========================================================================
+        function filterBySelectedSem(list, fallbackSem = 'Sem 3') {
+            if (!list) return [];
+            if (APP.selectedSemester === 'ALL') return list;
+            return list.filter(item => (item.semester || fallbackSem) === APP.selectedSemester);
+        }
+
+        function renderDashboardView() {
+            const d = APP.data;
+            const semStudents = filterBySelectedSem(d.students || []);
+            const semSubjects = filterBySelectedSem(d.subjects || []);
+            const semEntries = filterBySelectedSem(d.timetableEntries || []);
+
+            const totalStudents = semStudents.length;
+            const totalFaculty = (d.faculty || []).length;
+            const totalSubjects = semSubjects.length;
+            const totalRooms = (d.rooms || []).length;
+            const totalEntries = semEntries.length;
+            const totalConflicts = (d.conflicts || []).filter(c => {
+                if (APP.selectedSemester === 'ALL') return true;
+                return String(c.entryASummary || '').startsWith(APP.selectedSemester.replace('Sem ', ''))
+                    || String(c.entryBSummary || '').startsWith(APP.selectedSemester.replace('Sem ', ''));
+            }).length;
+
+            const q = APP.searchQuery.trim().toLowerCase();
+            const filteredEntries = semEntries.filter(e => {
+                if (APP.filterDay !== 'ALL' && e.dayOfWeek !== APP.filterDay) return false;
+                if (APP.filterSection !== 'ALL' && e.sectionCode !== APP.filterSection) return false;
+                if (!q) return true;
+                return (
+                    String(e.subjectCode).toLowerCase().includes(q) ||
+                    String(e.subjectName).toLowerCase().includes(q) ||
+                    String(e.facultyName).toLowerCase().includes(q) ||
+                    String(e.roomCode).toLowerCase().includes(q) ||
+                    String(e.sectionCode).toLowerCase().includes(q) ||
+                    String(e.dayOfWeek).toLowerCase().includes(q)
+                );
+            });
+            const availableSections = filterBySelectedSem(d.sections || []);
+
+            return `
+                <!-- 6 KPI Summary Cards (Screenshot 3) -->
+                <div class="kpi-grid">
+                    <div class="kpi-card" onclick="switchTab('students')">
+                        <div class="kpi-label">TOTAL STUDENTS</div>
+                        <div class="kpi-value">${totalStudents}</div>
+                        <div class="kpi-sub">${APP.selectedSemester === 'ALL' ? (APP.mode === 'MODE_B' ? 'Enrolled (Sem 1–8)' : 'Enrolled in Sem 3') : 'Enrolled in ' + escapeHtml(APP.selectedSemester)}</div>
+                    </div>
+                    <div class="kpi-card cyan" onclick="switchTab('faculty')">
+                        <div class="kpi-label">TOTAL FACULTY</div>
+                        <div class="kpi-value">${totalFaculty}</div>
+                        <div class="kpi-sub">Active Instructors</div>
+                    </div>
+                    <div class="kpi-card amber" onclick="switchTab('subjects')">
+                        <div class="kpi-label">TOTAL SUBJECTS</div>
+                        <div class="kpi-value">${totalSubjects}</div>
+                        <div class="kpi-sub">RTU Theory &amp; Labs</div>
+                    </div>
+                    <div class="kpi-card purple" onclick="switchTab('rooms')">
+                        <div class="kpi-label">CLASSROOMS &amp; LABS</div>
+                        <div class="kpi-value">${totalRooms}</div>
+                        <div class="kpi-sub">Block A &amp; Block C</div>
+                    </div>
+                    <div class="kpi-card emerald" onclick="switchTab('timetable')">
+                        <div class="kpi-label">TIMETABLE ENTRIES</div>
+                        <div class="kpi-value">${totalEntries}</div>
+                        <div class="kpi-sub">${APP.mode === 'MODE_B' ? 'PIET Master Schedule' : 'Weekly Scheduled Slots'}</div>
+                    </div>
+                    <div class="kpi-card danger" onclick="APP.reportsSubTab='conflicts'; switchTab('reports')">
+                        <div class="kpi-label">SCHEDULE CONFLICTS</div>
+                        <div class="kpi-value">${totalConflicts}</div>
+                        <div class="kpi-sub">${totalConflicts > 0 ? 'Click to Resolve via CSP' : 'Zero Active Clashes'}</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Bar (Screenshot 3) -->
+                <div class="quick-actions-bar">
+                    <div class="quick-actions-left">
+                        <span class="quick-label">Quick Actions:</span>
+                        <button class="btn btn-emerald" onclick="openEntityModal('students', 'add')">+ Student</button>
+                        <button class="btn btn-cyan" onclick="openEntityModal('faculty', 'add')">+ Faculty</button>
+                        <button class="btn btn-amber" onclick="openEntityModal('subjects', 'add')">+ Subject</button>
+                        <button class="btn btn-purple" onclick="switchTab('autogenerator')">Auto-Generator Studio</button>
+                        <button class="btn btn-primary" onclick="switchTab('timetable')">Manage Timetable</button>
+                    </div>
+                    <div class="toolbar-right">
+                        ${totalConflicts > 0 ? `
+                            <button class="btn btn-danger" onclick="resolveAllConflictsNow()">
+                                Auto-Resolve ${totalConflicts} Conflict(s) (CSP)
+                            </button>
+                        ` : ''}
+                        <a class="btn btn-emerald" href="/api/export/timetable.csv?mode=${APP.mode}&semester=${encodeURIComponent(APP.selectedSemester)}" style="text-decoration:none;">Export CSV</a>
+                        <a class="btn btn-primary" href="/api/export/report.html?mode=${APP.mode}&semester=${encodeURIComponent(APP.selectedSemester)}" target="_blank" style="text-decoration:none;">Export HTML/PDF</a>
+                    </div>
+                </div>
+
+                <!-- Master Scheduled Timetable Entries Table (Screenshot 3) -->
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <span class="panel-heading">Master Scheduled Timetable Entries (${filteredEntries.length} of ${totalEntries})</span>
+                        </div>
+                        <div class="toolbar-right">
+                            <input type="text" class="search-input" placeholder="Search subject, faculty, room..." value="${escapeHtml(APP.searchQuery)}" oninput="APP.searchQuery=this.value; renderCurrentView();">
+                            <select class="filter-select" onchange="APP.filterDay=this.value; renderCurrentView();">
+                                <option value="ALL" ${APP.filterDay === 'ALL' ? 'selected' : ''}>All Days</option>
+                                <option value="Monday" ${APP.filterDay === 'Monday' ? 'selected' : ''}>Monday</option>
+                                <option value="Tuesday" ${APP.filterDay === 'Tuesday' ? 'selected' : ''}>Tuesday</option>
+                                <option value="Wednesday" ${APP.filterDay === 'Wednesday' ? 'selected' : ''}>Wednesday</option>
+                                <option value="Thursday" ${APP.filterDay === 'Thursday' ? 'selected' : ''}>Thursday</option>
+                                <option value="Friday" ${APP.filterDay === 'Friday' ? 'selected' : ''}>Friday</option>
+                                <option value="Saturday" ${APP.filterDay === 'Saturday' ? 'selected' : ''}>Saturday</option>
+                            </select>
+                            <select class="filter-select" onchange="APP.filterSection=this.value; renderCurrentView();">
+                                <option value="ALL" ${APP.filterSection === 'ALL' ? 'selected' : ''}>All Sections</option>
+                                ${availableSections.map(sec =>
+                                    `<option value="${escapeHtml(sec.sectionCode)}" ${APP.filterSection === sec.sectionCode ? 'selected' : ''}>${escapeHtml(sec.sectionCode)} (${escapeHtml(sec.semester)})</option>`
+                                ).join('')}
+                            </select>
+                            <button class="btn btn-emerald" onclick="openSlotModal(null)">+ Add Slot</button>
+                            <button class="btn btn-slate" onclick="APP.searchQuery=''; APP.filterDay='ALL'; APP.filterSection='ALL'; renderCurrentView();">Reset</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Day / Date</th>
+                                    <th>Period</th>
+                                    <th>Time Slot</th>
+                                    <th>Section (Batch)</th>
+                                    <th>Subject Code &amp; Name</th>
+                                    <th>Type</th>
+                                    <th>Faculty Instructor</th>
+                                    <th>Room / Lab</th>
+                                    <th>CSP Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${filteredEntries.map(e => `
+                                    <tr class="${e.hasConflict ? 'conflict-row' : ''}" ondblclick="openSlotModal(${e.id})">
+                                        <td>#${e.id}</td>
+                                        <td><strong>${escapeHtml(e.dayOfWeek)}</strong> <span style="color:#64748B;font-size:11px;">${escapeHtml(e.dateLabel || '')}</span></td>
+                                        <td><span class="badge badge-blue">${escapeHtml(e.periodCode)}</span></td>
+                                        <td>${escapeHtml(e.timeRange)}</td>
+                                        <td><strong>${escapeHtml(e.sectionCode)}</strong> <span class="badge badge-slate">${escapeHtml(e.batchCode)}</span></td>
+                                        <td><strong>${escapeHtml(e.subjectCode)}</strong> — ${escapeHtml(e.subjectName)}</td>
+                                        <td><span class="badge ${e.sessionType === 'Lab' ? 'badge-purple' : 'badge-emerald'}">${escapeHtml(e.sessionType)}</span></td>
+                                        <td>
+                                            ${escapeHtml(e.facultyName)}
+                                            ${e.substituteFaculty ? `<br><span class="badge badge-amber">Sub: ${escapeHtml(e.substituteFaculty)}</span>` : ''}
+                                        </td>
+                                        <td><span class="badge badge-purple">${escapeHtml(e.roomCode)}</span></td>
+                                        <td>
+                                            ${e.hasConflict
+                                                ? `<span class="badge badge-red" title="${escapeHtml(e.conflictReason)}">CLASH DETECTED</span>`
+                                                : `<span class="badge badge-emerald">Verified</span>`}
+                                        </td>
+                                        <td>
+                                            <div style="display:flex;gap:5px;">
+                                                <button class="btn btn-amber btn-sm" onclick="event.stopPropagation(); openSlotModal(${e.id})">Edit</button>
+                                                ${e.hasConflict ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); resolveSingleConflict(${e.id})">CSP Fix</button>` : ''}
+                                                <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteEntityRecord('timetable', ${e.id})">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // 2.2 STUDENT MANAGEMENT (SCREENSHOT 4)
+        // =========================================================================
+        function renderStudentsView() {
+            const q = APP.searchQuery.trim().toLowerCase();
+            const rows = filterBySelectedSem(APP.data.students || []).filter(s =>
+                !q ||
+                String(s.enrollmentNo).toLowerCase().includes(q) ||
+                String(s.fullName).toLowerCase().includes(q) ||
+                String(s.email).toLowerCase().includes(q) ||
+                String(s.sectionBatch).toLowerCase().includes(q)
+            );
+            const selectedId = Number(APP.selectedRowIds.students);
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <input type="text" class="search-input" placeholder="Search by enrollment no, student name, email..." value="${escapeHtml(APP.searchQuery)}" oninput="APP.searchQuery=this.value; renderCurrentView();">
+                            <button class="btn btn-primary" onclick="renderCurrentView()">Search</button>
+                            <button class="btn btn-slate" onclick="APP.searchQuery=''; renderCurrentView();">Reset</button>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-emerald" onclick="openEntityModal('students', 'add')">+ Add Student</button>
+                            <button class="btn btn-amber" onclick="openEntityModal('students', 'edit')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedRow('students')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Enrollment No</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Department</th>
+                                    <th>Course</th>
+                                    <th>Semester</th>
+                                    <th>Section / Batch</th>
+                                    <th>Admission Year</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(s => `
+                                    <tr class="${Number(s.id) === selectedId ? 'selected-row' : ''}"
+                                        onclick="selectTableRow('students', ${s.id})"
+                                        ondblclick="selectTableRow('students', ${s.id}); openEntityModal('students', 'edit')">
+                                        <td>${s.displayId}</td>
+                                        <td><strong>${escapeHtml(s.enrollmentNo)}</strong></td>
+                                        <td><strong>${escapeHtml(s.fullName)}</strong></td>
+                                        <td>${escapeHtml(s.email)}</td>
+                                        <td>${escapeHtml(s.phone)}</td>
+                                        <td>${escapeHtml(s.departmentName)}</td>
+                                        <td>${escapeHtml(s.courseName)}</td>
+                                        <td>${escapeHtml(s.semester)}</td>
+                                        <td><span class="badge badge-blue">${escapeHtml(s.sectionBatch)}</span></td>
+                                        <td>${s.admissionYear}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // 2.3 FACULTY MANAGEMENT (SCREENSHOT 5)
+        // =========================================================================
+        function renderFacultyView() {
+            const q = APP.searchQuery.trim().toLowerCase();
+            const rows = (APP.data.faculty || []).filter(f =>
+                !q ||
+                String(f.facultyCode).toLowerCase().includes(q) ||
+                String(f.fullName).toLowerCase().includes(q) ||
+                String(f.specialization).toLowerCase().includes(q) ||
+                String(f.assignedSubjects).toLowerCase().includes(q)
+            );
+            const selectedId = Number(APP.selectedRowIds.faculty);
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <input type="text" class="search-input" placeholder="Search faculty code, name, specialization..." value="${escapeHtml(APP.searchQuery)}" oninput="APP.searchQuery=this.value; renderCurrentView();">
+                            <button class="btn btn-primary" onclick="renderCurrentView()">Search</button>
+                            <button class="btn btn-slate" onclick="APP.searchQuery=''; renderCurrentView();">Reset</button>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-emerald" onclick="openEntityModal('faculty', 'add')">+ Add Faculty</button>
+                            <button class="btn btn-cyan" onclick="openAssignSubjectsModal()">Assign Subjects</button>
+                            <button class="btn btn-amber" onclick="openEntityModal('faculty', 'edit')">Edit</button>
+                            <button class="btn btn-purple" onclick="toggleSelectedFacultyLeave()">Toggle Leave / Substitute</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedRow('faculty')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Faculty ID</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Department</th>
+                                    <th>Designation</th>
+                                    <th>Specialization</th>
+                                    <th>Assigned Subjects</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(f => `
+                                    <tr class="${Number(f.id) === selectedId ? 'selected-row' : ''}"
+                                        onclick="selectTableRow('faculty', ${f.id})"
+                                        ondblclick="selectTableRow('faculty', ${f.id}); openEntityModal('faculty', 'edit')">
+                                        <td>${f.displayId}</td>
+                                        <td><strong>${escapeHtml(f.facultyCode)}</strong></td>
+                                        <td><strong>${escapeHtml(f.fullName)}</strong></td>
+                                        <td>${escapeHtml(f.email)}</td>
+                                        <td>${escapeHtml(f.phone)}</td>
+                                        <td>${escapeHtml(f.departmentName)}</td>
+                                        <td>${escapeHtml(f.designation)}</td>
+                                        <td>${escapeHtml(f.specialization)}</td>
+                                        <td><span class="badge badge-blue">${escapeHtml(f.assignedSubjects)}</span></td>
+                                        <td>
+                                            ${f.onLeave
+                                                ? `<span class="badge badge-red">ON LEAVE (Sub Active)</span>`
+                                                : `<span class="badge badge-emerald">Active</span>`}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // 2.4 DEPARTMENT MANAGEMENT (SCREENSHOT 6)
+        // =========================================================================
+        function renderDepartmentsView() {
+            const q = APP.searchQuery.trim().toLowerCase();
+            const rows = (APP.data.departments || []).filter(d =>
+                !q ||
+                String(d.code).toLowerCase().includes(q) ||
+                String(d.name).toLowerCase().includes(q)
+            );
+            const selectedId = Number(APP.selectedRowIds.departments);
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <input type="text" class="search-input" placeholder="Search department code or name..." value="${escapeHtml(APP.searchQuery)}" oninput="APP.searchQuery=this.value; renderCurrentView();">
+                            <button class="btn btn-primary" onclick="renderCurrentView()">Search</button>
+                            <button class="btn btn-slate" onclick="APP.searchQuery=''; renderCurrentView();">Reset</button>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-emerald" onclick="openEntityModal('departments', 'add')">+ Add Department</button>
+                            <button class="btn btn-amber" onclick="openEntityModal('departments', 'edit')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedRow('departments')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Department Code</th>
+                                    <th>Department Name</th>
+                                    <th>Head of Department (HOD)</th>
+                                    <th>Academic Block</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(d => `
+                                    <tr class="${Number(d.id) === selectedId ? 'selected-row' : ''}"
+                                        onclick="selectTableRow('departments', ${d.id})"
+                                        ondblclick="selectTableRow('departments', ${d.id}); openEntityModal('departments', 'edit')">
+                                        <td>${d.displayId}</td>
+                                        <td><strong>${escapeHtml(d.code)}</strong></td>
+                                        <td><strong>${escapeHtml(d.name)}</strong></td>
+                                        <td>${escapeHtml(d.hodName || 'Dr. Anil Kumar')}</td>
+                                        <td><span class="badge badge-slate">${escapeHtml(d.buildingBlock || 'Block A & C')}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // COURSE MANAGEMENT
+        // =========================================================================
+        function renderCoursesView() {
+            const q = APP.searchQuery.trim().toLowerCase();
+            const rows = (APP.data.courses || []).filter(c =>
+                !q ||
+                String(c.code).toLowerCase().includes(q) ||
+                String(c.name).toLowerCase().includes(q) ||
+                String(c.departmentName).toLowerCase().includes(q)
+            );
+            const selectedId = Number(APP.selectedRowIds.courses);
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <input type="text" class="search-input" placeholder="Search course code or program name..." value="${escapeHtml(APP.searchQuery)}" oninput="APP.searchQuery=this.value; renderCurrentView();">
+                            <button class="btn btn-primary" onclick="renderCurrentView()">Search</button>
+                            <button class="btn btn-slate" onclick="APP.searchQuery=''; renderCurrentView();">Reset</button>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-emerald" onclick="openEntityModal('courses', 'add')">+ Add Course</button>
+                            <button class="btn btn-amber" onclick="openEntityModal('courses', 'edit')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedRow('courses')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Course Code</th>
+                                    <th>Course / Degree Name</th>
+                                    <th>Department</th>
+                                    <th>Duration (Years)</th>
+                                    <th>Total Semesters</th>
+                                    <th>Credits</th>
+                                    <th>Program Coordinator</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(c => `
+                                    <tr class="${Number(c.id) === selectedId ? 'selected-row' : ''}"
+                                        onclick="selectTableRow('courses', ${c.id})"
+                                        ondblclick="selectTableRow('courses', ${c.id}); openEntityModal('courses', 'edit')">
+                                        <td>${c.displayId}</td>
+                                        <td><strong>${escapeHtml(c.code)}</strong></td>
+                                        <td><strong>${escapeHtml(c.name)}</strong></td>
+                                        <td>${escapeHtml(c.departmentName)}</td>
+                                        <td>${c.durationYears} Years</td>
+                                        <td>${c.totalSemesters} Semesters</td>
+                                        <td>${c.totalCredits}</td>
+                                        <td>${escapeHtml(c.coordinator || 'Dr. Varsha Kumari')}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // 2.5 SUBJECT MANAGEMENT (SCREENSHOT 7)
+        // =========================================================================
+        function renderSubjectsView() {
+            const q = APP.searchQuery.trim().toLowerCase();
+            const rows = filterBySelectedSem(APP.data.subjects || []).filter(s =>
+                !q ||
+                String(s.subjectCode).toLowerCase().includes(q) ||
+                String(s.rtuCode || '').toLowerCase().includes(q) ||
+                String(s.subjectName).toLowerCase().includes(q) ||
+                String(s.shortCode || '').toLowerCase().includes(q)
+            );
+            const selectedId = Number(APP.selectedRowIds.subjects);
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <input type="text" class="search-input" placeholder="Search subject code (CS-001 / 253CS...), name..." value="${escapeHtml(APP.searchQuery)}" oninput="APP.searchQuery=this.value; renderCurrentView();">
+                            <button class="btn btn-primary" onclick="renderCurrentView()">Search</button>
+                            <button class="btn btn-slate" onclick="APP.searchQuery=''; renderCurrentView();">Reset</button>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-emerald" onclick="openEntityModal('subjects', 'add')">+ Add Subject</button>
+                            <button class="btn btn-amber" onclick="openEntityModal('subjects', 'edit')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedRow('subjects')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Subject Code</th>
+                                    <th>RTU Bridge Code</th>
+                                    <th>Short Abbr</th>
+                                    <th>Subject Name</th>
+                                    <th>Department</th>
+                                    <th>Semester</th>
+                                    <th>Type</th>
+                                    <th>Credits</th>
+                                    <th>Weekly Hrs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(s => `
+                                    <tr class="${Number(s.id) === selectedId ? 'selected-row' : ''}"
+                                        onclick="selectTableRow('subjects', ${s.id})"
+                                        ondblclick="selectTableRow('subjects', ${s.id}); openEntityModal('subjects', 'edit')">
+                                        <td>${s.displayId}</td>
+                                        <td><strong>${escapeHtml(s.subjectCode)}</strong></td>
+                                        <td><span class="badge badge-slate">${escapeHtml(s.rtuCode || '-')}</span></td>
+                                        <td><span class="badge badge-blue">${escapeHtml(s.shortCode || '-')}</span></td>
+                                        <td><strong>${escapeHtml(s.subjectName)}</strong></td>
+                                        <td>${escapeHtml(s.departmentName)}</td>
+                                        <td>${escapeHtml(s.semester)}</td>
+                                        <td><span class="badge ${s.subjectType === 'Lab' ? 'badge-purple' : 'badge-emerald'}">${escapeHtml(s.subjectType)}</span></td>
+                                        <td>${s.credits}</td>
+                                        <td>${s.weeklyHours} hrs/wk</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // 2.6 ROOMS & LABS INVENTORY
+        // =========================================================================
+        function renderRoomsView() {
+            const q = APP.searchQuery.trim().toLowerCase();
+            const rows = (APP.data.roomUtilization || []).filter(r =>
+                !q ||
+                String(r.roomCode).toLowerCase().includes(q) ||
+                String(r.roomName).toLowerCase().includes(q) ||
+                String(r.roomType).toLowerCase().includes(q)
+            );
+            const selectedId = Number(APP.selectedRowIds.rooms);
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <input type="text" class="search-input" placeholder="Search room code (A-202, A-209, C-207)..." value="${escapeHtml(APP.searchQuery)}" oninput="APP.searchQuery=this.value; renderCurrentView();">
+                            <button class="btn btn-primary" onclick="renderCurrentView()">Search</button>
+                            <button class="btn btn-slate" onclick="APP.searchQuery=''; renderCurrentView();">Reset</button>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-emerald" onclick="openEntityModal('rooms', 'add')">+ Add Room</button>
+                            <button class="btn btn-amber" onclick="openEntityModal('rooms', 'edit')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedRow('rooms')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Room Code</th>
+                                    <th>Room / Lab Name</th>
+                                    <th>Type</th>
+                                    <th>Block</th>
+                                    <th>Seating Capacity</th>
+                                    <th>Weekly Slots</th>
+                                    <th>Occupied Slots</th>
+                                    <th>Free Slots</th>
+                                    <th>Utilization %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(r => `
+                                    <tr class="${Number(r.id) === selectedId ? 'selected-row' : ''}"
+                                        onclick="selectTableRow('rooms', ${r.id})"
+                                        ondblclick="selectTableRow('rooms', ${r.id}); openEntityModal('rooms', 'edit')">
+                                        <td><strong>${escapeHtml(r.roomCode)}</strong></td>
+                                        <td><strong>${escapeHtml(r.roomName)}</strong></td>
+                                        <td><span class="badge ${r.roomType === 'Lab' ? 'badge-purple' : 'badge-blue'}">${escapeHtml(r.roomType)}</span></td>
+                                        <td>${escapeHtml(r.buildingBlock || 'Block A')}</td>
+                                        <td>${r.capacity} Seats</td>
+                                        <td>${r.totalWeeklySlots}</td>
+                                        <td><strong>${r.occupiedSlots}</strong></td>
+                                        <td>${r.freeSlots}</td>
+                                        <td><span class="badge ${Number(r.utilizationPct) >= 60 ? 'badge-amber' : Number(r.utilizationPct) >= 40 ? 'badge-emerald' : 'badge-blue'}">${r.utilizationPct}% (${escapeHtml(r.status)})</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // TIME SLOT CONFIGURATION (SCREENSHOT 8)
+        // =========================================================================
+        function renderTimeSlotsView() {
+            const rows = APP.data.timeSlots || [];
+            const selectedId = Number(APP.selectedRowIds.timeslots);
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <span class="panel-heading">Standard College Bell Schedule (PIET III-Semester • 08:30 AM to 03:40 PM)</span>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-emerald" onclick="openEntityModal('timeslots', 'add')">+ Add Time Slot</button>
+                            <button class="btn btn-amber" onclick="openEntityModal('timeslots', 'edit')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedRow('timeslots')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Slot Code</th>
+                                    <th>Period Label</th>
+                                    <th>Applicable Days</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Slot Category</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(t => `
+                                    <tr class="${Number(t.id) === selectedId ? 'selected-row' : ''}"
+                                        onclick="selectTableRow('timeslots', ${t.id})"
+                                        ondblclick="selectTableRow('timeslots', ${t.id}); openEntityModal('timeslots', 'edit')">
+                                        <td>#${t.periodNumber}</td>
+                                        <td><strong>${escapeHtml(t.slotCode)}</strong></td>
+                                        <td><strong>${escapeHtml(t.slotLabel)}</strong></td>
+                                        <td>${escapeHtml(t.dayOfWeek)}</td>
+                                        <td><span class="badge badge-blue">${escapeHtml(t.startTime)}</span></td>
+                                        <td><span class="badge badge-blue">${escapeHtml(t.endTime)}</span></td>
+                                        <td><span class="badge ${t.slotType === 'Break' ? 'badge-amber' : 'badge-emerald'}">${escapeHtml(t.slotType)}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // SECTION 3: MULTI-MODE TIMETABLE GRID ENGINE (4 TABS)
+        // =========================================================================
+        function renderTimetableView() {
+            return `
+                <div class="subtab-bar no-print">
+                    <button class="subtab-btn ${APP.timetableSubTab === 'section' ? 'active' : ''}"
+                            onclick="APP.timetableSubTab='section'; renderCurrentView();">
+                        <span>Tab 1: Section View</span>
+                        <span class="subtab-badge">3CSA..3CSRD</span>
+                    </button>
+                    <button class="subtab-btn ${APP.timetableSubTab === 'batch' ? 'active' : ''}"
+                            onclick="APP.timetableSubTab='batch'; renderCurrentView();">
+                        <span>Tab 2: Sub-Batch Split</span>
+                        <span class="subtab-badge">A1 • A2 • A3</span>
+                    </button>
+                    <button class="subtab-btn ${APP.timetableSubTab === 'faculty' ? 'active' : ''}"
+                            onclick="APP.timetableSubTab='faculty'; renderCurrentView();">
+                        <span>Tab 3: Faculty Schedule</span>
+                        <span class="subtab-badge">Teaching</span>
+                    </button>
+                    <button class="subtab-btn ${APP.timetableSubTab === 'piet_master' ? 'active' : ''}"
+                            onclick="APP.timetableSubTab='piet_master'; renderCurrentView();">
+                        <span>Tab 4: PIET Daily Master</span>
+                        <span class="subtab-badge">309 Cells</span>
+                    </button>
+                </div>
+
+                ${APP.timetableSubTab === 'section' ? renderSectionTimetableGrid(false) : ''}
+                ${APP.timetableSubTab === 'batch' ? renderSectionTimetableGrid(true) : ''}
+                ${APP.timetableSubTab === 'faculty' ? renderFacultyTeachingScheduleGrid() : ''}
+                ${APP.timetableSubTab === 'piet_master' ? renderPietDailyMasterSheet() : ''}
+            `;
+        }
+
+        function renderSectionTimetableGrid(isBatchMode) {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const periods = [
+                { code: 'P1', time: '08:30 - 09:30' },
+                { code: 'P2', time: '09:30 - 10:30' },
+                { code: 'P3', time: '10:30 - 11:30' },
+                { code: 'P4', time: '11:30 - 12:30' },
+                { code: 'BREAK', time: '12:30 - 01:10' },
+                { code: 'P5', time: '01:10 - 02:00' },
+                { code: 'P6', time: '02:00 - 02:50' }
+            ];
+
+            const availableSections = filterBySelectedSem(APP.data.sections || []);
+            if (availableSections.length > 0 && !availableSections.some(s => s.sectionCode === APP.selectedSection)) {
+                APP.selectedSection = availableSections[0].sectionCode;
+            }
+            const sec = APP.selectedSection;
+            const secObj = (APP.data.sections || []).find(s => s.sectionCode === sec);
+            const rawBatches = (secObj?.subBatches || 'A1, A2, A3').split(',').map(b => b.trim()).filter(Boolean);
+            const batchesForSec = ['ALL', ...rawBatches];
+
+            if (isBatchMode && !batchesForSec.includes(APP.selectedBatch)) {
+                APP.selectedBatch = batchesForSec[1] || 'ALL';
+            }
+
+            const entries = (APP.data.timetableEntries || []).filter(e => {
+                if (e.sectionCode !== sec) return false;
+                if (!isBatchMode) return true;
+                if (APP.selectedBatch === 'ALL') return true;
+                return e.batchCode === 'ALL' || e.batchCode === APP.selectedBatch;
+            });
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <span class="panel-heading">
+                                ${isBatchMode
+                                    ? `Sub-Batch Schedule: ${sec} — Batch ${APP.selectedBatch} (Lectures + Batch Practicals)`
+                                    : `Weekly Section Timetable Grid: ${escapeHtml(secObj?.semester || 'Sem 3')} - ${sec}`}
+                            </span>
+                        </div>
+                        <div class="toolbar-right no-print">
+                            <label style="font-size:12px;font-weight:700;color:#475569;">Section:</label>
+                            <select class="filter-select" onchange="APP.selectedSection=this.value; renderCurrentView();">
+                                ${availableSections.map(s =>
+                                    `<option value="${escapeHtml(s.sectionCode)}" ${sec === s.sectionCode ? 'selected' : ''}>${escapeHtml(s.sectionName || s.sectionCode)}</option>`
+                                ).join('')}
+                            </select>
+
+                            ${isBatchMode ? `
+                                <label style="font-size:12px;font-weight:700;color:#475569;">Sub-Batch:</label>
+                                <select class="filter-select" onchange="APP.selectedBatch=this.value; renderCurrentView();">
+                                    ${batchesForSec.map(b => `
+                                        <option value="${b}" ${APP.selectedBatch === b ? 'selected' : ''}>
+                                            ${b === 'ALL' ? 'All Sub-Batches Split View' : 'Batch ' + b}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            ` : ''}
+
+                            <button class="btn btn-purple" onclick="switchTab('autogenerator')">Auto-Generator</button>
+                            <button class="btn btn-emerald" onclick="openSlotModal(null, {sectionCode:'${sec}', batchCode:'${isBatchMode ? APP.selectedBatch : 'ALL'}'})">+ Add Slot</button>
+                            <button class="btn btn-primary" onclick="window.print()">Print Schedule</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="tt-grid-table" style="min-width: 1080px;">
+                            <thead>
+                                <tr>
+                                    <th class="sticky-col" style="width:105px;">DAY / PERIOD</th>
+                                    ${periods.map(p => p.code === 'BREAK'
+                                        ? `<th class="break-col">LUNCH<br><span style="font-weight:400;font-size:10px;">12:30-01:10</span></th>`
+                                        : `<th>${p.code}<br><span style="font-weight:400;font-size:10.5px;color:#CBD5E1;">${p.time}</span></th>`
+                                    ).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${days.map(day => `
+                                    <tr>
+                                        <td class="day-cell">${day.toUpperCase()}</td>
+                                        ${periods.map(p => {
+                                            if (p.code === 'BREAK') {
+                                                return `<td class="break-cell">LUNCH BREAK</td>`;
+                                            }
+                                            const cellEntries = entries.filter(e => e.dayOfWeek === day && e.periodCode === p.code);
+                                            return `
+                                                <td class="slot-cell">
+                                                    ${cellEntries.map(e => renderSlotCardHtml(e)).join('')}
+                                                    ${cellEntries.length === 0 ? `
+                                                        <button class="empty-slot-btn no-print"
+                                                                onclick="openSlotModal(null, {dayOfWeek:'${day}', periodCode:'${p.code}', sectionCode:'${sec}', batchCode:'${isBatchMode && APP.selectedBatch !== 'ALL' ? APP.selectedBatch : 'ALL'}'})">
+                                                            + Add Slot
+                                                        </button>
+                                                    ` : ''}
+                                                </td>
+                                            `;
+                                        }).join('')}
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // TAB 3: FACULTY TEACHING SCHEDULE (MY TEACHING SCHEDULE - SCREENSHOT 1)
+        // =========================================================================
+        function renderFacultyTeachingScheduleGrid() {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const periods = [
+                { code: 'P1', time: '08:30 - 09:30' },
+                { code: 'P2', time: '09:30 - 10:30' },
+                { code: 'P3', time: '10:30 - 11:30' },
+                { code: 'P4', time: '11:30 - 12:30' },
+                { code: 'BREAK', time: '12:30 - 01:10' },
+                { code: 'P5', time: '01:10 - 02:00' },
+                { code: 'P6', time: '02:00 - 02:50' }
+            ];
+
+            // Build unique list of all faculty names in current dataset + Dr. Rajesh Verma
+            const facNamesSet = new Set(['Dr. Rajesh Verma']);
+            (APP.data.faculty || []).forEach(f => facNamesSet.add(f.fullName));
+            (APP.data.timetableEntries || []).forEach(e => {
+                if (e.facultyName) facNamesSet.add(e.facultyName);
+            });
+            const facNames = Array.from(facNamesSet);
+
+            if (!facNames.includes(APP.selectedFaculty)) {
+                APP.selectedFaculty = facNames[0];
+            }
+
+            const myEntries = filterBySelectedSem(APP.data.timetableEntries || []).filter(e =>
+                e.facultyName === APP.selectedFaculty || e.substituteFaculty === APP.selectedFaculty
+            );
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <span class="panel-heading">MY TEACHING SCHEDULE — ${escapeHtml(APP.selectedFaculty)}</span>
+                            <span class="badge badge-blue">${myEntries.length} Weekly Sessions Assigned</span>
+                        </div>
+                        <div class="toolbar-right no-print">
+                            <label style="font-size:12px;font-weight:700;color:#475569;">Select Faculty:</label>
+                            <select class="filter-select" onchange="APP.selectedFaculty=this.value; renderCurrentView();">
+                                ${facNames.map(fn => `<option value="${escapeHtml(fn)}" ${APP.selectedFaculty === fn ? 'selected' : ''}>${escapeHtml(fn)}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-emerald" onclick="openSlotModal(null, {facultyName:'${escapeJsAttr(APP.selectedFaculty)}'})">+ Add Teaching Slot</button>
+                            <button class="btn btn-primary" onclick="window.print()">Print Schedule</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="tt-grid-table" style="min-width: 1080px;">
+                            <thead>
+                                <tr>
+                                    <th class="sticky-col" style="width:105px;">DAY / PERIOD</th>
+                                    ${periods.map(p => p.code === 'BREAK'
+                                        ? `<th class="break-col">LUNCH<br><span style="font-weight:400;font-size:10px;">12:30-01:10</span></th>`
+                                        : `<th>${p.code}<br><span style="font-weight:400;font-size:10.5px;color:#CBD5E1;">${p.time}</span></th>`
+                                    ).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${days.map(day => `
+                                    <tr>
+                                        <td class="day-cell">${day.toUpperCase()}</td>
+                                        ${periods.map(p => {
+                                            if (p.code === 'BREAK') {
+                                                return `<td class="break-cell">LUNCH BREAK</td>`;
+                                            }
+                                            const cellEntries = myEntries.filter(e => e.dayOfWeek === day && e.periodCode === p.code);
+                                            return `
+                                                <td class="slot-cell">
+                                                    ${cellEntries.map(e => renderSlotCardHtml(e)).join('')}
+                                                    ${cellEntries.length === 0 ? `<div style="height:76px;display:flex;align-items:center;justify-content:center;color:#CBD5E1;font-size:11px;">Free Period</div>` : ''}
+                                                </td>
+                                            `;
+                                        }).join('')}
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // TAB 4: PIET III-SEM MULTI-SECTION DAILY MASTER SHEET (OCT 5-9, 2026)
+        // =========================================================================
+        function renderPietDailyMasterSheet() {
+            const daysMeta = [
+                { day: 'Monday', date: '05-10-2026' },
+                { day: 'Tuesday', date: '06-10-2026' },
+                { day: 'Wednesday', date: '07-10-2026' },
+                { day: 'Thursday', date: '08-10-2026' },
+                { day: 'Friday', date: '09-10-2026' }
+            ];
+            const periods = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
+            const targetSem = APP.selectedSemester === 'ALL' ? 'Sem 3' : APP.selectedSemester;
+            const matchedSections = (APP.data.sections || []).filter(s => s.semester === targetSem).map(s => s.sectionCode);
+            const sections = matchedSections.length > 0 ? matchedSections : ['3CSA', '3CSB', '3CSC', '3CSRD'];
+
+            const filteredDays = APP.selectedPietDay === 'ALL'
+                ? daysMeta
+                : daysMeta.filter(d => d.day === APP.selectedPietDay);
+
+            const allEntries = (APP.data.timetableEntries || []).filter(e => (e.semester || 'Sem 3') === targetSem);
+
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <span class="panel-heading">
+                                PIET Computer Engg. — ${escapeHtml(targetSem)} Master Daily Timetable (Oct 5–9, 2026 • ${allEntries.length} Cells)
+                            </span>
+                        </div>
+                        <div class="toolbar-right no-print">
+                            ${APP.mode !== 'MODE_B' ? `
+                                <button class="btn btn-amber" onclick="document.getElementById('datasetModeSelect').value='MODE_B'; handleModeSwitch('MODE_B');">
+                                    Load Full PIET Sem 1–8 Dataset (Mode B)
+                                </button>
+                            ` : `<span class="badge badge-emerald">${allEntries.length} ${escapeHtml(targetSem)} Cells Active</span>`}
+
+                            <select class="filter-select" onchange="APP.selectedPietDay=this.value; renderCurrentView();">
+                                <option value="ALL" ${APP.selectedPietDay === 'ALL' ? 'selected' : ''}>All 5 Excel Sheets (Oct 5 – Oct 9, 2026)</option>
+                                <option value="Monday" ${APP.selectedPietDay === 'Monday' ? 'selected' : ''}>Sheet 1: Monday (05-10-2026)</option>
+                                <option value="Tuesday" ${APP.selectedPietDay === 'Tuesday' ? 'selected' : ''}>Sheet 2: Tuesday (06-10-2026)</option>
+                                <option value="Wednesday" ${APP.selectedPietDay === 'Wednesday' ? 'selected' : ''}>Sheet 3: Wednesday (07-10-2026)</option>
+                                <option value="Thursday" ${APP.selectedPietDay === 'Thursday' ? 'selected' : ''}>Sheet 4: Thursday (08-10-2026)</option>
+                                <option value="Friday" ${APP.selectedPietDay === 'Friday' ? 'selected' : ''}>Sheet 5: Friday (09-10-2026)</option>
+                            </select>
+
+                            <a class="btn btn-emerald" href="/api/export/timetable.csv?mode=${APP.mode}&semester=${encodeURIComponent(targetSem)}" style="text-decoration:none;">Export Master CSV</a>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="tt-grid-table" style="min-width: 1100px;">
+                            <thead>
+                                <tr>
+                                    <th class="sticky-col" style="width:105px;">DATE / DAY</th>
+                                    <th style="width:85px;">SECTION</th>
+                                    <th>P1 (08:30-09:30)</th>
+                                    <th>P2 (09:30-10:30)</th>
+                                    <th>P3 (10:30-11:30)</th>
+                                    <th>P4 (11:30-12:30)</th>
+                                    <th class="break-col">LUNCH</th>
+                                    <th>P5 (01:10-02:00)</th>
+                                    <th>P6 (02:00-02:50)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${filteredDays.map(dm => sections.map((sec, sIdx) => `
+                                    <tr>
+                                        ${sIdx === 0 ? `
+                                            <td class="day-cell" rowspan="${sections.length}">
+                                                <strong>${dm.day.toUpperCase()}</strong><br>
+                                                <span style="font-size:11px;color:#64748B;">${dm.date}</span>
+                                            </td>
+                                        ` : ''}
+                                        <td style="position:static;background:#EFF6FF;color:#1E40AF;font-weight:800;font-size:12px;text-align:center;border-right:1px solid #CBD5E1;border-bottom:1px solid #E2E8F0;padding:8px 6px;">
+                                            <strong>${sec}</strong>
+                                        </td>
+                                        ${['P1', 'P2', 'P3', 'P4', 'BREAK', 'P5', 'P6'].map(p => {
+                                            if (p === 'BREAK') {
+                                                return sIdx === 0 ? `<td class="break-cell" rowspan="${sections.length}">12:30 - 01:10 PM</td>` : '';
+                                            }
+                                            const slots = allEntries.filter(e => e.dayOfWeek === dm.day && e.periodCode === p && e.sectionCode === sec);
+                                            return `
+                                                <td class="slot-cell" style="height:auto;min-height:80px;">
+                                                    ${slots.map(e => renderSlotCardHtml(e)).join('')}
+                                                    ${slots.length === 0 ? `
+                                                        <button class="empty-slot-btn no-print" style="min-height:54px;"
+                                                                onclick="openSlotModal(null, {dayOfWeek:'${dm.day}', dateLabel:'${dm.date}', periodCode:'${p}', sectionCode:'${sec}', batchCode:'ALL'})">
+                                                            + Slot
+                                                        </button>
+                                                    ` : ''}
+                                                </td>
+                                            `;
+                                        }).join('')}
+                                    </tr>
+                                `).join('')).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSlotCardHtml(e) {
+            const themeClass = `theme-${e.colorTheme || 'blue'}`;
+            const conflictClass = e.hasConflict ? 'conflict-card' : '';
+            return `
+                <div class="slot-card ${themeClass} ${conflictClass}"
+                     onclick="openSlotModal(${e.id})"
+                     title="${e.hasConflict ? 'CONFLICT: ' + escapeHtml(e.conflictReason) : 'Click to edit slot #' + e.id}">
+                    <div class="slot-code-line">
+                        <span>${escapeHtml(e.subjectCode)}</span>
+                        <span class="badge ${e.batchCode === 'ALL' ? 'badge-blue' : 'badge-purple'}" style="font-size:9.5px;padding:1px 5px;">
+                            ${escapeHtml(e.sectionCode)} • ${escapeHtml(e.batchCode)}
+                        </span>
+                    </div>
+                    <div class="slot-title-line">${escapeHtml(e.subjectName)}</div>
+                    <div class="slot-meta-line">
+                        <span>${escapeHtml(e.substituteFaculty ? 'Sub: ' + e.substituteFaculty : e.facultyName)}</span>
+                        <span class="room-pill">${escapeHtml(e.roomCode)}</span>
+                    </div>
+                    ${e.hasConflict ? `<div style="margin-top:4px;font-size:10px;font-weight:800;color:#DC2626;">⚠ CLASH: ${escapeHtml(e.roomCode)}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // SECTION 4: REPORTS & ANALYTICS (SCREENSHOT 10 + WORKLOAD + CSP LOG)
+        // =========================================================================
+        function renderReportsView() {
+            const conflictsCount = (APP.data.conflicts || []).length;
+            return `
+                <div class="subtab-bar no-print">
+                    <button class="subtab-btn ${APP.reportsSubTab === 'rooms' ? 'active' : ''}"
+                            onclick="APP.reportsSubTab='rooms'; renderCurrentView();">
+                        <span>1. Room Utilization</span>
+                        <span class="subtab-badge">Screenshot 10</span>
+                    </button>
+                    <button class="subtab-btn ${APP.reportsSubTab === 'workload' ? 'active' : ''}"
+                            onclick="APP.reportsSubTab='workload'; renderCurrentView();">
+                        <span>2. Faculty Workload</span>
+                        <span class="subtab-badge">Leave Manager</span>
+                    </button>
+                    <button class="subtab-btn ${APP.reportsSubTab === 'conflicts' ? 'active' : ''}"
+                            onclick="APP.reportsSubTab='conflicts'; renderCurrentView();">
+                        <span>3. CSP Conflict Audit</span>
+                        <span class="subtab-badge ${conflictsCount > 0 ? 'danger' : ''}">${conflictsCount} Clashes</span>
+                    </button>
+                </div>
+
+                ${APP.reportsSubTab === 'rooms' ? renderRoomUtilizationReport() : ''}
+                ${APP.reportsSubTab === 'workload' ? renderFacultyWorkloadReport() : ''}
+                ${APP.reportsSubTab === 'conflicts' ? renderConflictAuditReport() : ''}
+            `;
+        }
+
+        function renderRoomUtilizationReport() {
+            const rows = APP.data.roomUtilization || [];
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <span class="panel-heading">Classroom &amp; Laboratory Weekly Utilization Report (36 Weekly Slots Benchmark)</span>
+                        </div>
+                        <div class="toolbar-right no-print">
+                            <a class="btn btn-emerald" href="/api/export/rooms.csv?mode=${APP.mode}&semester=${encodeURIComponent(APP.selectedSemester)}" style="text-decoration:none;">Export CSV</a>
+                            <a class="btn btn-primary" href="/api/export/report.html?mode=${APP.mode}&semester=${encodeURIComponent(APP.selectedSemester)}" target="_blank" style="text-decoration:none;">Export HTML/PDF</a>
+                            <button class="btn btn-slate" onclick="window.print()">Print View</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Room Code</th>
+                                    <th>Room Name</th>
+                                    <th>Type</th>
+                                    <th>Capacity</th>
+                                    <th>Weekly Slots</th>
+                                    <th>Occupied Slots</th>
+                                    <th>Free Slots</th>
+                                    <th>Utilization %</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(r => {
+                                    const pct = parseFloat(r.utilizationPct) || 0;
+                                    const barClass = pct >= 65 ? 'moderate' : pct >= 40 ? 'optimal' : 'low';
+                                    const badgeClass = r.status === 'Moderate' ? 'badge-amber'
+                                                     : r.status === 'Optimal' ? 'badge-emerald' : 'badge-blue';
+                                    return `
+                                        <tr>
+                                            <td><strong>${escapeHtml(r.roomCode)}</strong></td>
+                                            <td><strong>${escapeHtml(r.roomName)}</strong></td>
+                                            <td><span class="badge ${r.roomType === 'Lab' ? 'badge-purple' : 'badge-slate'}">${escapeHtml(r.roomType)}</span></td>
+                                            <td>${r.capacity}</td>
+                                            <td>${r.totalWeeklySlots}</td>
+                                            <td><strong>${r.occupiedSlots}</strong></td>
+                                            <td>${r.freeSlots}</td>
+                                            <td>
+                                                <div class="progress-wrap">
+                                                    <div class="progress-track">
+                                                        <div class="progress-fill ${barClass}" style="width:${Math.min(100, pct)}%;"></div>
+                                                    </div>
+                                                    <strong style="min-width:44px;text-align:right;">${r.utilizationPct}%</strong>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge ${badgeClass}">${escapeHtml(r.status)}</span></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFacultyWorkloadReport() {
+            const rows = APP.data.facultyWorkload || [];
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <span class="panel-heading">Faculty Weekly Workload Distribution &amp; Dynamic Leave Substitution Manager</span>
+                        </div>
+                        <div class="toolbar-right no-print">
+                            <button class="btn btn-slate" onclick="window.print()">Print View</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Faculty Code</th>
+                                    <th>Instructor Name</th>
+                                    <th>Designation</th>
+                                    <th>Specialization</th>
+                                    <th>Lecture Hrs</th>
+                                    <th>Lab Hrs</th>
+                                    <th>Total Assigned / Max</th>
+                                    <th>Workload %</th>
+                                    <th>Availability Status</th>
+                                    <th>Leave Substitution Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(f => `
+                                    <tr>
+                                        <td><strong>${escapeHtml(f.facultyCode)}</strong></td>
+                                        <td><strong>${escapeHtml(f.fullName)}</strong></td>
+                                        <td>${escapeHtml(f.designation)}</td>
+                                        <td>${escapeHtml(f.specialization)}</td>
+                                        <td>${f.lectureHours} hrs</td>
+                                        <td>${f.labHours} hrs</td>
+                                        <td><strong>${f.assignedHours} / ${f.maxWeeklyHours} hrs</strong></td>
+                                        <td>
+                                            <div class="progress-wrap">
+                                                <div class="progress-track">
+                                                    <div class="progress-fill optimal" style="width:${Math.min(100, parseFloat(f.workloadPct))}%;"></div>
+                                                </div>
+                                                <strong>${f.workloadPct}%</strong>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            ${f.onLeave
+                                                ? `<span class="badge badge-red">ON LEAVE</span>`
+                                                : `<span class="badge badge-emerald">Active On-Duty</span>`}
+                                        </td>
+                                        <td>
+                                            <button class="btn ${f.onLeave ? 'btn-emerald' : 'btn-amber'} btn-sm"
+                                                    onclick="toggleFacultyLeaveById(${f.id})">
+                                                ${f.onLeave ? 'Mark Returned (Restore Classes)' : 'Mark On Leave (Auto-Assign Sub)'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderConflictAuditReport() {
+            const conflicts = APP.data.conflicts || [];
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <span class="panel-heading">Constraint Satisfaction Problem (CSP) Schedule Clash Audit Log (${conflicts.length} Detected)</span>
+                        </div>
+                        <div class="toolbar-right no-print">
+                            ${conflicts.length > 0 ? `
+                                <button class="btn btn-primary" onclick="resolveAllConflictsNow()">
+                                    Auto-Resolve All ${conflicts.length} Conflicts via CSP Solver
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-slate" onclick="resetFactoryDatasets()">Reset Demo Clashes</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Clash #</th>
+                                    <th>Constraint Type</th>
+                                    <th>Severity</th>
+                                    <th>Day / Date</th>
+                                    <th>Period</th>
+                                    <th>Clashing Resource</th>
+                                    <th>Conflicting Slot A</th>
+                                    <th>Conflicting Slot B</th>
+                                    <th>CSP Auto-Resolution</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${conflicts.length === 0 ? `
+                                    <tr>
+                                        <td colspan="9" style="text-align:center;padding:28px;color:#059669;font-weight:700;">
+                                            ✓ All hard scheduling constraints (Room Exclusivity, Faculty Non-Overlap, Batch Separation) are 100% satisfied!
+                                        </td>
+                                    </tr>
+                                ` : conflicts.map(c => `
+                                    <tr class="conflict-row">
+                                        <td><strong>#${c.conflictId}</strong></td>
+                                        <td><span class="badge badge-red">${escapeHtml(c.type)}</span></td>
+                                        <td><span class="badge badge-amber">${escapeHtml(c.severity)}</span></td>
+                                        <td><strong>${escapeHtml(c.dayOfWeek)}</strong> (${escapeHtml(c.dateLabel || '')})</td>
+                                        <td><span class="badge badge-blue">${escapeHtml(c.periodCode)}</span></td>
+                                        <td><strong>${escapeHtml(c.resource)}</strong></td>
+                                        <td>${escapeHtml(c.entryASummary)}</td>
+                                        <td>${escapeHtml(c.entryBSummary)}</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="resolveSingleConflict(${c.entryBId})">
+                                                Resolve via CSP Engine
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // 8-SEMESTER SMART AUTO-GENERATOR STUDIO (CSP + BACKTRACKING + DRAG-DROP)
+        // =========================================================================
+        function renderAutoGeneratorView() {
+            const cfg = APP.genConfig;
+            const preview = APP.data.generatorPreview || [];
+            const meta = APP.data.generatorMeta || {};
+            const hasPreview = preview.length > 0;
+            const sems = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'];
+
+            const semList = hasPreview
+                ? sems.filter(sem => preview.some(e => (e.semester || 'Sem 3') === sem))
+                : sems;
+            if (semList.length > 0 && !semList.includes(cfg.previewSemester)) {
+                cfg.previewSemester = semList[0];
+            }
+
+            const genSecsForSem = (APP.data.sections || []).filter(s => s.semester === cfg.previewSemester);
+            if (genSecsForSem.length > 0 && !genSecsForSem.some(s => s.sectionCode === cfg.previewSection)) {
+                cfg.previewSection = genSecsForSem[0].sectionCode;
+            }
+
+            const activePreviewEntries = preview.filter(e =>
+                (e.semester || 'Sem 3') === cfg.previewSemester && e.sectionCode === cfg.previewSection
+            );
+
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const periods = [
+                { code: 'P1', time: '08:30 - 09:30' },
+                { code: 'P2', time: '09:30 - 10:30' },
+                { code: 'P3', time: '10:30 - 11:30' },
+                { code: 'P4', time: '11:30 - 12:30' },
+                { code: 'BREAK', time: '12:30 - 01:10' },
+                { code: 'P5', time: '01:10 - 02:00' },
+                { code: 'P6', time: '02:00 - 02:50' }
+            ];
+
+            const breakdown = meta.semesterBreakdown || {};
+            const warnings = meta.softWarnings || [];
+
+            return `
+                <div class="gen-studio-grid">
+                    <!-- Left: CSP Auto-Generator Parameters Card -->
+                    <div class="gen-config-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <div>
+                                <h2 style="font-size:15px;font-weight:800;color:#0F172A;margin-bottom:2px;">8-Semester Smart Auto-Generator Parameters</h2>
+                                <p style="font-size:12px;color:#64748B;">CSP &amp; Backtracking Engine • Solves Theory, Tutorials, 2-Hr Batch Labs &amp; Sem 8 Projects simultaneously</p>
+                            </div>
+                            <span class="badge badge-purple">${escapeHtml(APP.mode === 'MODE_B' ? 'PIET Sem 1–8' : 'Mode A Demo')}</span>
+                        </div>
+
+                        <div class="form-grid" style="margin-bottom:8px;">
+                            <div class="form-group">
+                                <label>Target Scope</label>
+                                <select class="form-control" onchange="APP.genConfig.targetScope=this.value;">
+                                    <option value="ALL" ${cfg.targetScope === 'ALL' ? 'selected' : ''}>All 8 Semesters (Campus-Wide Sem 1–8)</option>
+                                    ${sems.map(s => `<option value="${s}" ${cfg.targetScope === s ? 'selected' : ''}>Specific: ${s}</option>`).join('')}
+                                    <option value="CSE" ${cfg.targetScope === 'CSE' ? 'selected' : ''}>Department: Computer Engineering (CSE)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Constraints Enforcement Level</label>
+                                <select class="form-control" onchange="APP.genConfig.enforcementLevel=this.value;">
+                                    <option value="STRICT" ${cfg.enforcementLevel === 'STRICT' ? 'selected' : ''}>Strict (Zero Hard Clashes Guaranteed)</option>
+                                    <option value="BALANCED" ${cfg.enforcementLevel === 'BALANCED' ? 'selected' : ''}>Balanced (Soft Priority Relaxation)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="gen-checkbox-grid">
+                            <label class="gen-check-item">
+                                <input type="checkbox" ${cfg.minimizeGaps ? 'checked' : ''} onchange="APP.genConfig.minimizeGaps=this.checked;">
+                                <span>Minimize Faculty Idle Gaps</span>
+                            </label>
+                            <label class="gen-check-item">
+                                <input type="checkbox" ${cfg.balanceLabs ? 'checked' : ''} onchange="APP.genConfig.balanceLabs=this.checked;">
+                                <span>Balance 2-Hr Labs Across Week</span>
+                            </label>
+                            <label class="gen-check-item">
+                                <input type="checkbox" ${cfg.respectCapacity ? 'checked' : ''} onchange="APP.genConfig.respectCapacity=this.checked;">
+                                <span>Respect Room &amp; Lab Capacity</span>
+                            </label>
+                            <label class="gen-check-item">
+                                <input type="checkbox" ${cfg.enforceMaxLoad ? 'checked' : ''} onchange="APP.genConfig.enforceMaxLoad=this.checked;">
+                                <span>Faculty Max Weekly Load (&le; 18 hrs)</span>
+                            </label>
+                        </div>
+
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                            <button class="btn btn-purple" style="height:40px;padding:0 18px;font-size:13px;" onclick="runAutoGeneratorNow()">
+                                Launch 8-Semester CSP Auto-Generator
+                            </button>
+                            ${hasPreview ? `
+                                <button class="btn btn-emerald" style="height:40px;padding:0 18px;font-size:13px;" onclick="publishGeneratedNow()">
+                                    Publish &amp; Save to Database (${preview.length} Slots)
+                                </button>
+                            ` : ''}
+                        </div>
+
+                        <div class="gen-step-bar">
+                            <div class="gen-step-pill ${cfg.pipelinePhase >= 1 ? (cfg.pipelinePhase > 1 ? 'done' : 'running') : ''}">
+                                1. Fetching Sem 1–8 Data
+                            </div>
+                            <div class="gen-step-pill ${cfg.pipelinePhase >= 2 ? (cfg.pipelinePhase > 2 ? 'done' : 'running') : ''}">
+                                2. Solving CSP &amp; 2-Hr Labs
+                            </div>
+                            <div class="gen-step-pill ${cfg.pipelinePhase >= 3 ? 'done' : ''}">
+                                3. Validating Campus Clashes
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Real-Time Generation Audit Report Card -->
+                    <div class="gen-config-card">
+                        <h2 style="font-size:15px;font-weight:800;color:#0F172A;margin-bottom:10px;">CSP Solver Audit &amp; Sem 1–8 Distribution</h2>
+                        ${hasPreview ? `
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+                                <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:10px;">
+                                    <div style="font-size:10.5px;font-weight:700;color:#1E40AF;">TOTAL SLOTS</div>
+                                    <div style="font-size:22px;font-weight:800;color:#1E3A8A;">${meta.totalSlotsGenerated || preview.length}</div>
+                                </div>
+                                <div style="background:${(meta.hardClashes || 0) === 0 ? '#ECFDF5' : '#FEF2F2'};border:1px solid ${(meta.hardClashes || 0) === 0 ? '#A7F3D0' : '#FECACA'};border-radius:6px;padding:10px;">
+                                    <div style="font-size:10.5px;font-weight:700;color:${(meta.hardClashes || 0) === 0 ? '#065F46' : '#991B1B'};">HARD CLASHES</div>
+                                    <div style="font-size:22px;font-weight:800;color:${(meta.hardClashes || 0) === 0 ? '#047857' : '#B91C1C'};">${meta.hardClashes ?? 0}</div>
+                                </div>
+                                <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;padding:10px;">
+                                    <div style="font-size:10.5px;font-weight:700;color:#92400E;">SOFT WARNINGS</div>
+                                    <div style="font-size:22px;font-weight:800;color:#B45309;">${warnings.length}</div>
+                                </div>
+                            </div>
+                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+                                ${sems.map(s => `
+                                    <span class="badge ${(breakdown[s] || 0) > 0 ? 'badge-blue' : 'badge-slate'}" style="cursor:pointer;" onclick="APP.genConfig.previewSemester='${s}'; renderCurrentView();">
+                                        ${s}: ${breakdown[s] || 0} slots
+                                    </span>
+                                `).join('')}
+                            </div>
+                            ${warnings.length > 0 ? `
+                                <div style="max-height:92px;overflow-y:auto;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;padding:8px 10px;font-size:11.5px;color:#92400E;">
+                                    ${warnings.map(w => `<div>• ${escapeHtml(w)}</div>`).join('')}
+                                </div>
+                            ` : `<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:6px;padding:10px;font-size:12px;font-weight:600;color:#065F46;">All campus constraints across rooms, capacities, and faculty weekly limits satisfied cleanly!</div>`}
+                        ` : `
+                            <div style="padding:26px 14px;text-align:center;background:#F8FAFC;border:1px dashed #CBD5E1;border-radius:8px;color:#475569;font-size:13px;">
+                                Configure parameters on the left and click <strong>Launch 8-Semester CSP Auto-Generator</strong> to run real-time constraint scheduling and preview Sem 1–Sem 8 timetables here.
+                            </div>
+                        `}
+                    </div>
+                </div>
+
+                <!-- Staging Preview Grid (Sem 1..8 Filter, Section Switcher, Drag-and-Drop & Click-to-Edit) -->
+                ${hasPreview ? `
+                    <div class="panel-card">
+                        <div class="panel-toolbar">
+                            <div class="toolbar-left">
+                                <span class="panel-heading">Generated Schedule Preview: ${escapeHtml(cfg.previewSemester)} — ${escapeHtml(cfg.previewSection)}</span>
+                                <span class="badge badge-cyan">Drag &amp; Drop Cards Between Cells or Click to Edit Before Publishing</span>
+                            </div>
+                            <div class="toolbar-right">
+                                <label style="font-size:12px;font-weight:700;color:#475569;">Semester:</label>
+                                <select class="filter-select" onchange="APP.genConfig.previewSemester=this.value; renderCurrentView();">
+                                    ${semList.map(s => `<option value="${s}" ${cfg.previewSemester === s ? 'selected' : ''}>${s}</option>`).join('')}
+                                </select>
+                                <label style="font-size:12px;font-weight:700;color:#475569;">Section:</label>
+                                <select class="filter-select" onchange="APP.genConfig.previewSection=this.value; renderCurrentView();">
+                                    ${genSecsForSem.map(s => `<option value="${escapeHtml(s.sectionCode)}" ${cfg.previewSection === s.sectionCode ? 'selected' : ''}>${escapeHtml(s.sectionCode)}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="tt-grid-table" style="min-width:1080px;">
+                                <thead>
+                                    <tr>
+                                        <th class="sticky-col" style="width:105px;">DAY / PERIOD</th>
+                                        ${periods.map(p => p.code === 'BREAK'
+                                            ? `<th class="break-col">LUNCH<br><span style="font-weight:400;font-size:10px;">12:30-01:10</span></th>`
+                                            : `<th>${p.code}<br><span style="font-weight:400;font-size:10.5px;color:#CBD5E1;">${p.time}</span></th>`
+                                        ).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${days.map(day => `
+                                        <tr>
+                                            <td class="day-cell">${day.toUpperCase()}</td>
+                                            ${periods.map(p => {
+                                                if (p.code === 'BREAK') return `<td class="break-cell">LUNCH BREAK</td>`;
+                                                const cellSlots = activePreviewEntries.filter(e => e.dayOfWeek === day && e.periodCode === p.code);
+                                                return `
+                                                    <td class="slot-cell"
+                                                        ondragover="handlePreviewDragOver(event)"
+                                                        ondragleave="this.classList.remove('drag-over')"
+                                                        ondrop="handlePreviewDrop(event, '${day}', '${p.code}')">
+                                                        ${cellSlots.map(e => `
+                                                            <div class="slot-card theme-${e.colorTheme || 'blue'} ${e.hasConflict ? 'conflict-card' : ''}"
+                                                                 draggable="true"
+                                                                 ondragstart="handlePreviewDragStart(event, ${e.id})"
+                                                                 onclick="openPreviewSlotModal(${e.id})"
+                                                                 title="Drag to move or click to edit preview slot #${e.id}">
+                                                                <div class="slot-code-line">
+                                                                    <span>${escapeHtml(e.subjectCode)}</span>
+                                                                    <span class="badge ${e.batchCode === 'ALL' ? 'badge-blue' : 'badge-purple'}" style="font-size:9.5px;padding:1px 5px;">
+                                                                        ${escapeHtml(e.sectionCode)} • ${escapeHtml(e.batchCode)}
+                                                                    </span>
+                                                                </div>
+                                                                <div class="slot-title-line">${escapeHtml(e.subjectName)}</div>
+                                                                <div class="slot-meta-line">
+                                                                    <span>${escapeHtml(e.facultyName)}</span>
+                                                                    <span class="room-pill">${escapeHtml(e.roomCode)}</span>
+                                                                </div>
+                                                                ${e.hasConflict ? `<div style="margin-top:3px;font-size:10px;font-weight:800;color:#DC2626;">⚠ CLASH</div>` : ''}
+                                                            </div>
+                                                        `).join('')}
+                                                    </td>
+                                                `;
+                                            }).join('')}
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        // =========================================================================
+        // SETTINGS & CSP ENGINE CONFIGURATION VIEW
+        // =========================================================================
+        function renderSettingsView() {
+            return `
+                <div class="panel-card">
+                    <div class="panel-toolbar">
+                        <div class="toolbar-left">
+                            <span class="panel-heading">Enterprise System Configuration, Dual-Dataset Seeder &amp; CSP Engine Controls</span>
+                        </div>
+                    </div>
+                    <div style="padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                        <div style="border:1px solid #E2E8F0;border-radius:8px;padding:18px;background:#F8FAFC;">
+                            <h3 style="font-size:15px;margin-bottom:8px;color:#0F172A;">1. Dual-Dataset Mode Switcher</h3>
+                            <p style="font-size:13px;color:#475569;margin-bottom:14px;line-height:1.5;">
+                                Seamlessly switch between <strong>Mode A (UI Screenshot Demo Dataset)</strong> with 4 Students, 6 Faculty, 14 Subjects, 8 Rooms, 90 Timetable Entries, and 8 Conflicts, and <strong>Mode B (PIET III-Sem Master Excel Dataset)</strong> with all 309 cells across Oct 5–9, 2026 (` + "`3CSA`, `3CSB`, `3CSC`, `3CSRD`" + `).
+                            </p>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                                <button class="btn ${APP.mode === 'MODE_A' ? 'btn-primary' : 'btn-outline'}"
+                                        onclick="document.getElementById('datasetModeSelect').value='MODE_A'; handleModeSwitch('MODE_A');">
+                                    Activate Mode A (Screenshots • 90 Slots)
+                                </button>
+                                <button class="btn ${APP.mode === 'MODE_B' ? 'btn-primary' : 'btn-outline'}"
+                                        onclick="document.getElementById('datasetModeSelect').value='MODE_B'; handleModeSwitch('MODE_B');">
+                                    Activate Mode B (PIET Master Excel • 309 Cells)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style="border:1px solid #E2E8F0;border-radius:8px;padding:18px;background:#F8FAFC;">
+                            <h3 style="font-size:15px;margin-bottom:8px;color:#0F172A;">2. CSP Auto-Scheduler &amp; Factory Reset</h3>
+                            <p style="font-size:13px;color:#475569;margin-bottom:14px;line-height:1.5;">
+                                Run the Java Constraint Satisfaction Problem (CSP) solver to eliminate all room and instructor double-bookings, or restore factory seed data for both datasets.
+                            </p>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                                <button class="btn btn-purple" onclick="switchTab('autogenerator')">Open 8-Sem Auto-Generator Studio</button>
+                                <button class="btn btn-emerald" onclick="resolveAllConflictsNow()">Run CSP Conflict Auto-Resolver</button>
+                                <button class="btn btn-danger" onclick="resetFactoryDatasets()">Restore Factory Seed Data</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // MODAL FORMS: ADD / EDIT / DELETE / ASSIGN SUBJECTS / TIMETABLE SLOT
+        // =========================================================================
+        function openEntityModal(entityType, action) {
+            const record = action === 'edit' ? getSelectedRecord(entityType) : null;
+            if (action === 'edit' && !record) {
+                showToast('Please select a row first', true);
+                return;
+            }
+            APP.modalContext = { kind: 'entity', entityType, action, id: record ? record.id : null };
+            const titleEl = document.getElementById('crudModalTitle');
+            const bodyEl = document.getElementById('crudModalBody');
+
+            const labelMap = {
+                students: 'Student',
+                faculty: 'Faculty Member',
+                departments: 'Department',
+                courses: 'Course Program',
+                subjects: 'Subject',
+                rooms: 'Classroom / Lab',
+                timeslots: 'Time Slot'
+            };
+            titleEl.textContent = `${action === 'edit' ? 'Edit' : 'Add New'} ${labelMap[entityType] || 'Record'}`;
+
+            if (entityType === 'students') {
+                bodyEl.innerHTML = `
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Enrollment No *</label>
+                            <input class="form-control" name="enrollmentNo" required value="${escapeHtml(record?.enrollmentNo || 'STU00' + ((APP.data.students?.length || 4) + 1))}">
+                        </div>
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input class="form-control" name="fullName" required value="${escapeHtml(record?.fullName || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input class="form-control" type="email" name="email" required value="${escapeHtml(record?.email || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone *</label>
+                            <input class="form-control" name="phone" required value="${escapeHtml(record?.phone || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Department *</label>
+                            <input class="form-control" name="departmentName" required value="${escapeHtml(record?.departmentName || 'Computer Science & Engineering')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Course *</label>
+                            <input class="form-control" name="courseName" required value="${escapeHtml(record?.courseName || 'B.Tech Computer Engineering')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Semester *</label>
+                            <input class="form-control" name="semester" required value="${escapeHtml(record?.semester || 'Sem 3')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Section / Batch *</label>
+                            <input class="form-control" name="sectionBatch" required value="${escapeHtml(record?.sectionBatch || 'A (Batch A1)')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Admission Year *</label>
+                            <input class="form-control" type="number" name="admissionYear" required value="${record?.admissionYear || 2025}">
+                        </div>
+                    </div>
+                `;
+            } else if (entityType === 'faculty') {
+                bodyEl.innerHTML = `
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Faculty ID *</label>
+                            <input class="form-control" name="facultyCode" required value="${escapeHtml(record?.facultyCode || 'FAC-00' + ((APP.data.faculty?.length || 6) + 1))}">
+                        </div>
+                        <div class="form-group">
+                            <label>Short Abbr</label>
+                            <input class="form-control" name="shortAbbr" value="${escapeHtml(record?.shortAbbr || 'FC')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input class="form-control" name="fullName" required value="${escapeHtml(record?.fullName || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input class="form-control" name="email" required value="${escapeHtml(record?.email || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone *</label>
+                            <input class="form-control" name="phone" required value="${escapeHtml(record?.phone || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Department *</label>
+                            <input class="form-control" name="departmentName" required value="${escapeHtml(record?.departmentName || 'Computer Science & Engineering')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Designation *</label>
+                            <input class="form-control" name="designation" required value="${escapeHtml(record?.designation || 'Assistant Professor')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Specialization *</label>
+                            <input class="form-control" name="specialization" required value="${escapeHtml(record?.specialization || 'Computer Science')}">
+                        </div>
+                        <div class="form-group full">
+                            <label>Assigned Subjects (Comma-separated codes) *</label>
+                            <input class="form-control" name="assignedSubjects" required value="${escapeHtml(record?.assignedSubjects || 'CS-001, CS-002')}">
+                        </div>
+                    </div>
+                `;
+            } else if (entityType === 'departments') {
+                bodyEl.innerHTML = `
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Department Code *</label>
+                            <input class="form-control" name="code" required value="${escapeHtml(record?.code || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Department Name *</label>
+                            <input class="form-control" name="name" required value="${escapeHtml(record?.name || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>HOD Name</label>
+                            <input class="form-control" name="hodName" value="${escapeHtml(record?.hodName || 'Dr. Anil Kumar')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Building Block</label>
+                            <input class="form-control" name="buildingBlock" value="${escapeHtml(record?.buildingBlock || 'Block A')}">
+                        </div>
+                    </div>
+                `;
+            } else if (entityType === 'courses') {
+                bodyEl.innerHTML = `
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Course Code *</label>
+                            <input class="form-control" name="code" required value="${escapeHtml(record?.code || 'BTECH-NEW')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Course Name *</label>
+                            <input class="form-control" name="name" required value="${escapeHtml(record?.name || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Department Code *</label>
+                            <input class="form-control" name="departmentCode" required value="${escapeHtml(record?.departmentCode || 'CSE')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Department Name *</label>
+                            <input class="form-control" name="departmentName" required value="${escapeHtml(record?.departmentName || 'Computer Science & Engineering')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (Years) *</label>
+                            <input class="form-control" type="number" name="durationYears" required value="${record?.durationYears || 4}">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Semesters *</label>
+                            <input class="form-control" type="number" name="totalSemesters" required value="${record?.totalSemesters || 8}">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Credits *</label>
+                            <input class="form-control" type="number" name="totalCredits" required value="${record?.totalCredits || 160}">
+                        </div>
+                        <div class="form-group">
+                            <label>Coordinator</label>
+                            <input class="form-control" name="coordinator" value="${escapeHtml(record?.coordinator || 'Dr. Varsha Kumari')}">
+                        </div>
+                    </div>
+                `;
+            } else if (entityType === 'subjects') {
+                bodyEl.innerHTML = `
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Subject Code *</label>
+                            <input class="form-control" name="subjectCode" required value="${escapeHtml(record?.subjectCode || 'CS-015')}">
+                        </div>
+                        <div class="form-group">
+                            <label>RTU Bridge Code</label>
+                            <input class="form-control" name="rtuCode" value="${escapeHtml(record?.rtuCode || '253CS4-07')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Short Abbr *</label>
+                            <input class="form-control" name="shortCode" required value="${escapeHtml(record?.shortCode || 'AI')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Subject Name *</label>
+                            <input class="form-control" name="subjectName" required value="${escapeHtml(record?.subjectName || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Department *</label>
+                            <input class="form-control" name="departmentName" required value="${escapeHtml(record?.departmentName || 'Computer Science & Engineering')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Semester *</label>
+                            <input class="form-control" name="semester" required value="${escapeHtml(record?.semester || 'Sem 3')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Subject Type *</label>
+                            <select class="form-control" name="subjectType">
+                                <option value="Theory" ${record?.subjectType === 'Theory' ? 'selected' : ''}>Theory</option>
+                                <option value="Lab" ${record?.subjectType === 'Lab' ? 'selected' : ''}>Lab</option>
+                                <option value="Zero Credit" ${record?.subjectType === 'Zero Credit' ? 'selected' : ''}>Zero Credit</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Credits *</label>
+                            <input class="form-control" type="number" name="credits" required value="${record?.credits ?? 3}">
+                        </div>
+                        <div class="form-group">
+                            <label>Weekly Hours *</label>
+                            <input class="form-control" type="number" name="weeklyHours" required value="${record?.weeklyHours ?? 3}">
+                        </div>
+                    </div>
+                `;
+            } else if (entityType === 'rooms') {
+                bodyEl.innerHTML = `
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Room Code *</label>
+                            <input class="form-control" name="roomCode" required value="${escapeHtml(record?.roomCode || 'A-210')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Room / Lab Name *</label>
+                            <input class="form-control" name="roomName" required value="${escapeHtml(record?.roomName || 'CS Lab 4')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Room Type *</label>
+                            <select class="form-control" name="roomType">
+                                <option value="Classroom" ${record?.roomType === 'Classroom' ? 'selected' : ''}>Classroom</option>
+                                <option value="Lab" ${record?.roomType === 'Lab' ? 'selected' : ''}>Lab</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Building Block *</label>
+                            <input class="form-control" name="buildingBlock" required value="${escapeHtml(record?.buildingBlock || 'Block A')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Capacity (Seats) *</label>
+                            <input class="form-control" type="number" name="capacity" required value="${record?.capacity || 60}">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Weekly Slots *</label>
+                            <input class="form-control" type="number" name="totalWeeklySlots" required value="${record?.totalWeeklySlots || 36}">
+                        </div>
+                    </div>
+                `;
+            } else if (entityType === 'timeslots') {
+                bodyEl.innerHTML = `
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Slot Code *</label>
+                            <input class="form-control" name="slotCode" required value="${escapeHtml(record?.slotCode || 'P8')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Slot Label *</label>
+                            <input class="form-control" name="slotLabel" required value="${escapeHtml(record?.slotLabel || 'Period 8')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Applicable Days *</label>
+                            <input class="form-control" name="dayOfWeek" required value="${escapeHtml(record?.dayOfWeek || 'Monday - Saturday')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Period Order # *</label>
+                            <input class="form-control" type="number" name="periodNumber" required value="${record?.periodNumber || 9}">
+                        </div>
+                        <div class="form-group">
+                            <label>Start Time *</label>
+                            <input class="form-control" name="startTime" required value="${escapeHtml(record?.startTime || '03:40 PM')}">
+                        </div>
+                        <div class="form-group">
+                            <label>End Time *</label>
+                            <input class="form-control" name="endTime" required value="${escapeHtml(record?.endTime || '04:30 PM')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Slot Type *</label>
+                            <select class="form-control" name="slotType">
+                                <option value="Lecture" ${record?.slotType === 'Lecture' ? 'selected' : ''}>Lecture</option>
+                                <option value="Lab" ${record?.slotType === 'Lab' ? 'selected' : ''}>Lab</option>
+                                <option value="Break" ${record?.slotType === 'Break' ? 'selected' : ''}>Break</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('crudModalBackdrop').classList.add('open');
+        }
+
+        function openAssignSubjectsModal() {
+            const fac = getSelectedRecord('faculty');
+            if (!fac) {
+                showToast('Select a faculty member first', true);
+                return;
+            }
+            APP.modalContext = { kind: 'assign_subjects', entityType: 'faculty', id: fac.id, record: fac };
+            document.getElementById('crudModalTitle').textContent = `Assign Subjects — ${fac.fullName} (${fac.facultyCode})`;
+            const allSubs = APP.data.subjects || [];
+            document.getElementById('crudModalBody').innerHTML = `
+                <div class="form-group full" style="margin-bottom:14px;">
+                    <label>Assigned Subject Codes (Comma-separated) *</label>
+                    <input class="form-control" id="assignSubjectsInput" name="assignedSubjects" required value="${escapeHtml(fac.assignedSubjects || '')}">
+                </div>
+                <div style="font-size:12px;color:#475569;margin-bottom:8px;font-weight:700;">Quick Click to Toggle Subject Code:</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    ${allSubs.map(s => `
+                        <button type="button" class="btn btn-outline btn-sm"
+                                onclick="toggleSubjectChip('${escapeJsAttr(s.subjectCode)}')">
+                            ${escapeHtml(s.subjectCode)} (${escapeHtml(s.shortCode || s.subjectName)})
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('crudModalBackdrop').classList.add('open');
+        }
+
+        function toggleSubjectChip(code) {
+            const input = document.getElementById('assignSubjectsInput');
+            if (!input) return;
+            const parts = input.value.split(',').map(x => x.trim()).filter(Boolean);
+            const idx = parts.indexOf(code);
+            if (idx >= 0) parts.splice(idx, 1);
+            else parts.push(code);
+            input.value = parts.join(', ');
+        }
+
+        function openSlotModal(entryId, defaults = {}) {
+            const existing = entryId
+                ? (APP.data.timetableEntries || []).find(e => Number(e.id) === Number(entryId))
+                : null;
+            APP.modalContext = { kind: 'slot', id: existing ? existing.id : null };
+            document.getElementById('crudModalTitle').textContent = existing
+                ? `Edit Scheduled Timetable Slot (#${existing.id})`
+                : `Schedule New Timetable Slot`;
+
+            const dayVal = existing?.dayOfWeek || defaults.dayOfWeek || 'Monday';
+            const periodVal = existing?.periodCode || defaults.periodCode || 'P1';
+            const secVal = existing?.sectionCode || defaults.sectionCode || '3CSA';
+            const batchVal = existing?.batchCode || defaults.batchCode || 'ALL';
+            const subCodeVal = existing?.subjectCode || (APP.data.subjects?.[0]?.subjectCode || 'CS-001');
+            const subNameVal = existing?.subjectName || (APP.data.subjects?.[0]?.subjectName || 'Data Structures and Algorithms');
+            const typeVal = existing?.sessionType || 'Lecture';
+            const facNameVal = existing?.facultyName || defaults.facultyName || (APP.data.faculty?.[0]?.fullName || 'Dr. Varsha Kumari');
+            const roomVal = existing?.roomCode || (APP.data.rooms?.[0]?.roomCode || 'A-202');
+
+            document.getElementById('crudModalBody').innerHTML = `
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Day of Week *</label>
+                        <select class="form-control" name="dayOfWeek">
+                            ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d =>
+                                `<option value="${d}" ${dayVal === d ? 'selected' : ''}>${d}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Period *</label>
+                        <select class="form-control" name="periodCode">
+                            ${['P1', 'P2', 'P3', 'P4', 'P5', 'P6'].map(p =>
+                                `<option value="${p}" ${periodVal === p ? 'selected' : ''}>${p}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Section *</label>
+                        <select class="form-control" name="sectionCode">
+                            ${(APP.data.sections || []).map(s => s.sectionCode).map(s =>
+                                `<option value="${s}" ${secVal === s ? 'selected' : ''}>${s}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Batch *</label>
+                        <input class="form-control" name="batchCode" required value="${escapeHtml(batchVal)}" placeholder="ALL, A1, A2, A3...">
+                    </div>
+                    <div class="form-group">
+                        <label>Subject Code *</label>
+                        <input class="form-control" name="subjectCode" required value="${escapeHtml(subCodeVal)}">
+                    </div>
+                    <div class="form-group">
+                        <label>Session Type *</label>
+                        <select class="form-control" name="sessionType">
+                            <option value="Lecture" ${typeVal === 'Lecture' ? 'selected' : ''}>Lecture</option>
+                            <option value="Lab" ${typeVal === 'Lab' ? 'selected' : ''}>Lab</option>
+                            <option value="Tutorial" ${typeVal === 'Tutorial' ? 'selected' : ''}>Tutorial</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label>Subject Full Name *</label>
+                        <input class="form-control" name="subjectName" required value="${escapeHtml(subNameVal)}">
+                    </div>
+                    <div class="form-group">
+                        <label>Faculty Instructor *</label>
+                        <input class="form-control" name="facultyName" required value="${escapeHtml(facNameVal)}">
+                    </div>
+                    <div class="form-group">
+                        <label>Room / Lab Code *</label>
+                        <select class="form-control" name="roomCode">
+                            ${(APP.data.rooms || []).map(r =>
+                                `<option value="${escapeHtml(r.roomCode)}" ${roomVal === r.roomCode ? 'selected' : ''}>${escapeHtml(r.roomCode)} (${escapeHtml(r.roomName)})</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                </div>
+                ${existing ? `
+                    <div style="margin-top:16px;padding-top:12px;border-top:1px solid #E2E8F0;display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:12px;color:#64748B;">Slot ID #${existing.id}</span>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="closeModal(); deleteEntityRecord('timetable', ${existing.id});">Delete This Slot</button>
+                    </div>
+                ` : ''}
+            `;
+            document.getElementById('crudModalBackdrop').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('crudModalBackdrop').classList.remove('open');
+            APP.modalContext = null;
+        }
+
+        async function submitModalForm(e) {
+            e.preventDefault();
+            if (!APP.modalContext) return;
+            const formData = new FormData(e.target);
+            const payload = {};
+            formData.forEach((v, k) => payload[k] = v);
+
+            const ctx = APP.modalContext;
+            try {
+                if (ctx.kind === 'assign_subjects') {
+                    const updated = Object.assign({}, ctx.record, { assignedSubjects: payload.assignedSubjects });
+                    await saveEntityToBackend('faculty', updated);
+                    closeModal();
+                    showToast(`Updated assigned subjects for ${ctx.record.fullName}`);
+                    return;
+                }
+
+                if (ctx.kind === 'preview_slot') {
+                    const json = await apiJsonFetch(`/api/generator/preview-update?mode=${encodeURIComponent(APP.mode)}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            mode: APP.mode,
+                            entryId: ctx.id,
+                            dayOfWeek: payload.dayOfWeek,
+                            periodCode: payload.periodCode,
+                            roomCode: payload.roomCode,
+                            facultyName: payload.facultyName
+                        })
+                    });
+                    APP.data.generatorPreview = json.entries || [];
+                    if (APP.data.generatorMeta) APP.data.generatorMeta.hardClashes = json.hardClashes ?? 0;
+                    closeModal();
+                    renderCurrentView();
+                    showToast(`Updated preview slot #${ctx.id} (Hard Clashes: ${json.hardClashes ?? 0})`);
+                    return;
+                }
+
+                if (ctx.kind === 'slot') {
+                    if (ctx.id) payload.id = ctx.id;
+                    const timeMap = {
+                        P1: '08:30 AM - 09:30 AM',
+                        P2: '09:30 AM - 10:30 AM',
+                        P3: '10:30 AM - 11:30 AM',
+                        P4: '11:30 AM - 12:30 PM',
+                        P5: '01:10 PM - 02:00 PM',
+                        P6: '02:00 PM - 02:50 PM'
+                    };
+                    payload.timeRange = timeMap[payload.periodCode] || '08:30 AM - 09:30 AM';
+                    payload.facultyCode = payload.facultyCode || 'FAC';
+                    payload.colorTheme = payload.sessionType === 'Lab' ? 'purple' : 'blue';
+                    await saveEntityToBackend('timetable', payload);
+                    closeModal();
+                    showToast(ctx.id ? `Updated timetable slot #${ctx.id}` : 'Added new timetable slot');
+                    return;
+                }
+
+                if (ctx.kind === 'entity') {
+                    if (ctx.id) payload.id = ctx.id;
+                    await saveEntityToBackend(ctx.entityType, payload);
+                    closeModal();
+                    showToast(`${ctx.id ? 'Updated' : 'Created'} ${ctx.entityType} record successfully`);
+                }
+            } catch (err) {
+                showToast(err.message || 'Operation failed', true);
+            }
+        }
+
+        async function saveEntityToBackend(entityType, payload) {
+            await apiJsonFetch(`/api/entity/${entityType}?mode=${encodeURIComponent(APP.mode)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            await fetchBackendState();
+        }
+
+        async function deleteSelectedRow(entityType) {
+            const rec = getSelectedRecord(entityType);
+            if (!rec) {
+                showToast('Please select a row first', true);
+                return;
+            }
+            await deleteEntityRecord(entityType, rec.id);
+        }
+
+        async function deleteEntityRecord(entityType, id) {
+            try {
+                await apiJsonFetch(`/api/entity/${entityType}/${id}?mode=${encodeURIComponent(APP.mode)}`, {
+                    method: 'DELETE'
+                });
+                await fetchBackendState();
+                showToast(`Deleted record #${id} from ${entityType}`);
+            } catch (err) {
+                showToast(err.message || `Failed to delete ${entityType} record`, true);
+            }
+        }
+
+        // =========================================================================
+        // CSP CONFLICT RESOLVER & LEAVE SUBSTITUTION CALLS
+        // =========================================================================
+        async function resolveSingleConflict(entryId) {
+            try {
+                const json = await apiJsonFetch(`/api/csp/resolve/${entryId}?mode=${encodeURIComponent(APP.mode)}`, {
+                    method: 'POST'
+                });
+                await fetchBackendState();
+                showToast(json.message || `Resolved conflict for slot #${entryId}`);
+            } catch (err) {
+                showToast(err.message || 'Failed to resolve conflict', true);
+            }
+        }
+
+        async function resolveAllConflictsNow() {
+            try {
+                const json = await apiJsonFetch(`/api/csp/resolve-all?mode=${encodeURIComponent(APP.mode)}`, {
+                    method: 'POST'
+                });
+                await fetchBackendState();
+                showToast(json.message || 'All schedule conflicts resolved via CSP Solver');
+            } catch (err) {
+                showToast(err.message || 'Failed to resolve conflicts', true);
+            }
+        }
+
+        async function toggleSelectedFacultyLeave() {
+            const rec = getSelectedRecord('faculty');
+            if (!rec) {
+                showToast('Select a faculty row first', true);
+                return;
+            }
+            await toggleFacultyLeaveById(rec.id);
+        }
+
+        async function toggleFacultyLeaveById(facId) {
+            try {
+                const json = await apiJsonFetch(`/api/faculty/leave/${facId}?mode=${encodeURIComponent(APP.mode)}`, {
+                    method: 'POST'
+                });
+                await fetchBackendState();
+                showToast(json.message || 'Updated faculty leave status');
+            } catch (err) {
+                showToast(err.message || 'Failed to update faculty leave status', true);
+            }
+        }
+
+        async function resetFactoryDatasets() {
+            try {
+                const json = await apiJsonFetch('/api/reset', { method: 'POST' });
+                APP.genConfig.pipelinePhase = 0;
+                await fetchBackendState();
+                showToast(json.message || 'Factory seed data restored');
+            } catch (err) {
+                showToast(err.message || 'Failed to restore factory datasets', true);
+            }
+        }
+
+        // =========================================================================
+        // 8-SEMESTER AUTO-GENERATOR STUDIO HANDLERS (RUN, DRAG-DROP, EDIT, PUBLISH)
+        // =========================================================================
+        async function runAutoGeneratorNow() {
+            const cfg = APP.genConfig;
+            cfg.pipelinePhase = 1;
+            renderCurrentView();
+
+            await new Promise(r => setTimeout(r, 150));
+            cfg.pipelinePhase = 2;
+            renderCurrentView();
+
+            try {
+                const res = await fetch(`/api/generator/run?mode=${encodeURIComponent(APP.mode)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: APP.mode,
+                        targetScope: cfg.targetScope,
+                        enforcementLevel: cfg.enforcementLevel,
+                        minimizeGaps: cfg.minimizeGaps,
+                        balanceLabs: cfg.balanceLabs,
+                        respectCapacity: cfg.respectCapacity,
+                        enforceMaxLoad: cfg.enforceMaxLoad
+                    })
+                });
+                const json = await res.json();
+                cfg.pipelinePhase = 3;
+                APP.data.generatorPreview = json.entries || [];
+                APP.data.generatorMeta = json;
+                if (cfg.targetScope && cfg.targetScope.startsWith('Sem ')) {
+                    cfg.previewSemester = cfg.targetScope;
+                }
+                renderCurrentView();
+                showToast(`Auto-Generator complete: ${json.totalSlotsGenerated} slots generated (${json.hardClashes} hard clashes)`);
+            } catch (err) {
+                cfg.pipelinePhase = 0;
+                renderCurrentView();
+                showToast('Auto-Generator failed to execute', true);
+            }
+        }
+
+        function handlePreviewDragStart(ev, entryId) {
+            APP.genConfig.dragEntryId = entryId;
+            if (ev.dataTransfer) {
+                ev.dataTransfer.setData('text/plain', String(entryId));
+                ev.dataTransfer.effectAllowed = 'move';
+            }
+        }
+
+        function handlePreviewDragOver(ev) {
+            ev.preventDefault();
+            if (ev.currentTarget) ev.currentTarget.classList.add('drag-over');
+        }
+
+        async function handlePreviewDrop(ev, day, periodCode) {
+            ev.preventDefault();
+            if (ev.currentTarget) ev.currentTarget.classList.remove('drag-over');
+            const idStr = (ev.dataTransfer && ev.dataTransfer.getData('text/plain')) || APP.genConfig.dragEntryId;
+            const entryId = Number(idStr);
+            if (!entryId) return;
+
+            try {
+                const json = await apiJsonFetch(`/api/generator/preview-update?mode=${encodeURIComponent(APP.mode)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: APP.mode, entryId, dayOfWeek: day, periodCode })
+                });
+                APP.data.generatorPreview = json.entries || [];
+                if (APP.data.generatorMeta) APP.data.generatorMeta.hardClashes = json.hardClashes ?? 0;
+                renderCurrentView();
+                showToast(`Moved preview slot #${entryId} to ${day} ${periodCode} (Clashes: ${json.hardClashes ?? 0})`);
+            } catch (err) {
+                showToast(err.message || 'Failed to update preview slot', true);
+            }
+        }
+
+        function openPreviewSlotModal(entryId) {
+            const existing = (APP.data.generatorPreview || []).find(e => Number(e.id) === Number(entryId));
+            if (!existing) return;
+            APP.modalContext = { kind: 'preview_slot', id: existing.id };
+            document.getElementById('crudModalTitle').textContent = `Tweak Generated Preview Slot (#${existing.id} • ${existing.sectionCode})`;
+            document.getElementById('crudModalBody').innerHTML = `
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Day of Week *</label>
+                        <select class="form-control" name="dayOfWeek">
+                            ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d =>
+                                `<option value="${d}" ${existing.dayOfWeek === d ? 'selected' : ''}>${d}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Period *</label>
+                        <select class="form-control" name="periodCode">
+                            ${['P1', 'P2', 'P3', 'P4', 'P5', 'P6'].map(p =>
+                                `<option value="${p}" ${existing.periodCode === p ? 'selected' : ''}>${p}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Room / Lab *</label>
+                        <select class="form-control" name="roomCode">
+                            ${(APP.data.rooms || []).map(r =>
+                                `<option value="${escapeHtml(r.roomCode)}" ${existing.roomCode === r.roomCode ? 'selected' : ''}>${escapeHtml(r.roomCode)} (${escapeHtml(r.roomName)})</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Faculty Instructor *</label>
+                        <select class="form-control" name="facultyName">
+                            ${(APP.data.faculty || []).map(f =>
+                                `<option value="${escapeHtml(f.fullName)}" ${existing.facultyName === f.fullName ? 'selected' : ''}>${escapeHtml(f.fullName)}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+            document.getElementById('crudModalBackdrop').classList.add('open');
+        }
+
+        async function publishGeneratedNow() {
+            try {
+                const json = await apiJsonFetch(`/api/generator/publish?mode=${encodeURIComponent(APP.mode)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: APP.mode,
+                        targetScope: APP.genConfig.targetScope
+                    })
+                });
+                await fetchBackendState();
+                showToast(json.message || `Published ${json.publishedCount} generated slots!`);
+            } catch (err) {
+                showToast(err.message || 'Failed to publish generated timetable', true);
+            }
+        }
+
+        async function triggerLogoutModal() {
+            const overlay = document.getElementById('signoutOverlay');
+            if (overlay) overlay.classList.add('active');
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+            } finally {
+                sessionStorage.removeItem('smartcampus_auth');
+                localStorage.removeItem('smartcampus_auth');
+                setTimeout(() => {
+                    window.location.href = '/login?loggedOut=1';
+                }, 420);
+            }
+        }
+
+        // =========================================================================
+        // UTILITIES
+        // =========================================================================
+        function showToast(msg, isError = false) {
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = 'toast';
+            if (isError) el.style.borderLeftColor = '#EF4444';
+            el.textContent = msg;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 3800);
+        }
+
+        async function apiJsonFetch(url, options = {}) {
+            const res = await fetch(url, options);
+            let data = null;
+            const ct = res.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+                data = await res.json().catch(() => null);
+            } else {
+                const txt = await res.text().catch(() => '');
+                try { data = txt ? JSON.parse(txt) : null; } catch (_) { data = txt ? { message: txt } : null; }
+            }
+            if (!res.ok) {
+                const msg = (data && (data.error || data.message)) || `HTTP ${res.status} error`;
+                throw new Error(msg);
+            }
+            return data || {};
+        }
+
+        function escapeJsAttr(str) {
+            if (str === null || str === undefined) return '';
+            return escapeHtml(String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+    </script>
+</body>
+</html>

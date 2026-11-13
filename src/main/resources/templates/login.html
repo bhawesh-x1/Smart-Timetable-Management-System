@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In • Smart Campus Timetable Management System (PIET v1.0.0)</title>
+    <style>
+        :root {
+            --navy-deep: #0B1220;
+            --navy-mid: #1A2234;
+            --primary-blue: #1E6BF1;
+            --primary-blue-hover: #1557CC;
+            --cyan-blue: #0EA5E9;
+            --emerald-green: #10B981;
+            --amber-orange: #F59E0B;
+            --vivid-purple: #8B5CF6;
+            --coral-red: #EF4444;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --surface-soft: #F8FAFC;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--navy-deep);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* =========================================================
+           ANIMATED SPLIT-SCREEN SHELL
+           ========================================================= */
+        .auth-shell {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+
+        /* LEFT SHOWCASE PANEL */
+        .brand-showcase {
+            flex: 1.15;
+            position: relative;
+            background: radial-gradient(circle at 18% 20%, rgba(30, 107, 241, 0.24), transparent 45%),
+                        radial-gradient(circle at 82% 78%, rgba(14, 165, 233, 0.20), transparent 48%),
+                        linear-gradient(145deg, #090E1A 0%, #111A2E 48%, #1A2234 100%);
+            color: #FFFFFF;
+            padding: 40px 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        #campusParticlesCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .aurora-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.45;
+            pointer-events: none;
+            z-index: 0;
+            will-change: transform;
+        }
+
+        .orb-1 {
+            width: 340px;
+            height: 340px;
+            background: #1E6BF1;
+            top: -80px;
+            left: -70px;
+            animation: floatOrb1 14s ease-in-out infinite alternate;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: #0EA5E9;
+            bottom: -70px;
+            right: -60px;
+            animation: floatOrb2 16s ease-in-out infinite alternate;
+        }
+
+        .orb-3 {
+            width: 220px;
+            height: 220px;
+            background: #8B5CF6;
+            top: 46%;
+            left: 55%;
+            opacity: 0.28;
+            animation: floatOrb3 18s ease-in-out infinite alternate;
+        }
+
+        .showcase-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: space-between;
+            gap: 28px;
+        }
+
+        /* BRAND LOGO HEADER */
+        .crest-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: fadeSlideDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .orbital-crest {
+            width: 52px;
+            height: 52px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(30, 107, 241, 0.25), rgba(14, 165, 233, 0.12));
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            box-shadow: 0 10px 28px rgba(30, 107, 241, 0.35);
+            flex-shrink: 0;
+        }
+
+        .orbital-ring {
+            position: absolute;
+            inset: -5px;
+            border-radius: 18px;
+            border: 1.5px dashed rgba(56, 189, 248, 0.45);
+            animation: slowSpin 18s linear infinite;
+            pointer-events: none;
+        }
+
+        .orbital-crest svg {
+            width: 26px;
+            height: 26px;
+            stroke: #38BDF8;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .crest-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: #FFFFFF;
+            text-transform: uppercase;
+        }
+
+        .crest-subtitle {
+            font-size: 12.5px;
+            color: #94A3B8;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* HERO SECTION */
+        .hero-block {
+            max-width: 560px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.14);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #6EE7B7;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            animation: fadeSlideUp 0.7s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10B981;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulseGlow 2s infinite;
+        }
+
+        .hero-heading {
+            font-size: clamp(28px, 3.2vw, 40px);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 14px;
+            animation: fadeSlideUp 0.75s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .hero-gradient-text {
+            background: linear-gradient(90deg, #60A5FA 0%, #38BDF8 45%, #34D399 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: shimmerGradient 6s linear infinite;
+        }
+
+        .hero-desc {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: #CBD5E1;
+            margin-bottom: 26px;
+            animation: fadeSlideUp 0.75s 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        /* FLOATING 3D ANIMATED TIMETABLE PREVIEW CARD */
+        .preview-stage {
+            perspective: 1100px;
+            animation: fadeSlideUp 0.85s 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .live-schedule-card {
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            padding: 18px 20px;
+            box-shadow: 0 24px 48px rgba(2, 6, 23, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transform: rotateY(-2deg) rotateX(2deg);
+            transition: transform 0.35s ease, border-color 0.35s ease;
+            animation: gentleHoverCard 6.5s ease-in-out infinite;
+        }
+
+        .live-schedule-card:hover {
+            transform: rotateY(0deg) rotateX(0deg) translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.45);
+        }
+
+        .preview-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        }
+
+        .preview-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #F8FAFC;
+            letter-spacing: 0.02em;
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .window-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .preview-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(30, 107, 241, 0.22);
+            color: #93C5FD;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+        }
+
+        .preview-slots {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .mini-slot {
+            border-radius: 10px;
+            padding: 10px 11px;
+            background: rgba(30, 41, 59, 0.75);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-left: 3px solid var(--primary-blue);
+            transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .mini-slot.active-highlight {
+            background: rgba(30, 107, 241, 0.22);
+            border-color: rgba(96, 165, 250, 0.45);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(30, 107, 241, 0.22);
+        }
+
+        .mini-slot.emerald { border-left-color: var(--emerald-green); }
+        .mini-slot.purple { border-left-color: var(--vivid-purple); }
+
+        .mini-slot-time {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94A3B8;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .mini-slot-sub {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mini-slot-meta {
+            font-size: 10.5px;
+            color: #CBD5E1;
+            display: flex;
+            justify-content: space-between;
+            gap: 4px;
+        }
+
+        /* BOTTOM METRICS STRIP */
+        .metrics-strip {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            animation: fadeSlideUp 0.85s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .metric-chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-radius: 12px;
+            padding: 12px 14px;
+            transition: border-color 0.25s ease, transform 0.25s ease;
+        }
+
+        .metric-chip:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .metric-num {
+            font-size: 20px;
+            font-weight: 800;
+            color: #FFFFFF;
+            line-height: 1.1;
+        }
+
+        .metric-lbl {
+            font-size: 11px;
+            color: #94A3B8;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .showcase-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #64748B;
+            padding-top: 8px;
+            border-top: 1px solid rgba(148, 163, 184, 0.12);
+            animation: fadeSlideUp 0.85s 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        /* RIGHT AUTH FORM PANEL */
+        .auth-panel {
+            flex: 0.92;
+            min-width: 440px;
+            background: #F8FAFC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 36px;
+            position: relative;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px 32px 26px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+            animation: cardReveal 0.72s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+            position: relative;
+        }
+
+        .auth-card.shake {
+            animation: shakeX 0.46s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        .auth-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .auth-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.015em;
+        }
+
+        .auth-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .ay-pill {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            background: #EBF3FF;
+            border: 1px solid #BFDBFE;
+            padding: 5px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        /* ANIMATED ROLE SEGMENTED TABS */
+        .role-tabs {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: #F1F5F9;
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .role-tab-glider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc((100% - 8px) / 3);
+            height: calc(100% - 8px);
+            background: #FFFFFF;
+            border-radius: 9px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 1;
+        }
+
+        .role-tab-btn {
+            position: relative;
+            z-index: 2;
+            border: none;
+            background: transparent;
+            padding: 9px 6px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 9px;
+            transition: color 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .role-tab-btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .role-tab-btn.active {
+            color: var(--primary-blue);
+        }
+
+        /* FORM CONTROLS */
+        .form-alert {
+            display: none;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            animation: fadeSlideDown 0.25s ease both;
+        }
+
+        .form-alert.error {
+            display: flex;
+            background: #FEF2F2;
+            color: #B91C1C;
+            border: 1px solid #FECACA;
+        }
+
+        .form-alert.info {
+            display: flex;
+            background: #ECFDF5;
+            color: #047857;
+            border: 1px solid #A7F3D0;
+        }
+
+        .field-group {
+            margin-bottom: 15px;
+        }
+
+        .field-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .field-hint {
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--primary-blue);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .field-hint:hover {
+            text-decoration: underline;
+        }
+
+        .input-shell {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            width: 17px;
+            height: 17px;
+            stroke: #94A3B8;
+            fill: none;
+            stroke-width: 2;
+            pointer-events: none;
+            transition: stroke 0.2s ease;
+        }
+
+        .auth-input, .auth-select {
+            width: 100%;
+            height: 44px;
+            padding: 0 40px 0 40px;
+            border-radius: 11px;
+            border: 1.5px solid #CBD5E1;
+            background: #FFFFFF;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease;
+        }
+
+        .auth-select {
+            padding-right: 14px;
+            cursor: pointer;
+        }
+
+        .auth-input:focus, .auth-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(30, 107, 241, 0.14);
+        }
+
+        .input-shell:focus-within .input-icon {
+            stroke: var(--primary-blue);
+        }
+
+        .eye-toggle {
+            position: absolute;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748B;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .eye-toggle:hover {
+            background: #F1F5F9;
+            color: var(--text-dark);
+        }
+
+        .eye-toggle svg {
+            width: 17px;
+            height: 17px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .form-options-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 6px 0 18px;
+            font-size: 12.5px;
+            color: #475569;
+        }
+
+        .remember-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .remember-label input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-blue);
+            cursor: pointer;
+        }
+
+        .link-btn {
+            border: none;
+            background: none;
+            color: var(--primary-blue);
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .link-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* ANIMATED SUBMIT BUTTON WITH SHIMMER */
+        .submit-btn {
+            width: 100%;
+            height: 46px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1E6BF1 0%, #0EA5E9 100%);
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: 0 10px 24px rgba(30, 107, 241, 0.28);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 65%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+            transform: skewX(-22deg);
+            transition: left 0.65s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(30, 107, 241, 0.36);
+        }
+
+        .submit-btn:hover:not(:disabled)::after {
+            left: 145%;
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.8;
+            cursor: wait;
+        }
+
+        .btn-spinner {
+            width: 17px;
+            height: 17px;
+            border: 2.5px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #FFFFFF;
+            border-radius: 50%;
+            animation: slowSpin 0.7s linear infinite;
+            display: none;
+        }
+
+        .submit-btn.loading .btn-spinner {
+            display: inline-block;
+        }
+
+        /* QUICK DEMO ACCESS SECTION */
+        .demo-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0 13px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .demo-divider::before, .demo-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #E2E8F0;
+        }
+
+        .quick-roles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .quick-role-btn {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            border: 1px solid #E2E8F0;
+            background: #F8FAFC;
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .quick-role-btn:hover {
+            transform: translateY(-2px);
+            background: #FFFFFF;
+            border-color: #93C5FD;
+            box-shadow: 0 6px 14px rgba(30, 107, 241, 0.09);
+        }
+
+        .role-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #FFFFFF;
+            flex-shrink: 0;
+        }
+
+        .role-avatar.blue { background: var(--primary-blue); }
+        .role-avatar.cyan { background: var(--cyan-blue); }
+        .role-avatar.emerald { background: var(--emerald-green); }
+        .role-avatar.purple { background: var(--vivid-purple); }
+
+        .qr-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .qr-meta {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        /* FULLSCREEN TRANSITION OVERLAY AFTER SUCCESS */
+        .launch-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(145deg, #090E1A 0%, #1A2234 100%);
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .launch-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .launch-check {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.16);
+            border: 2px solid #10B981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+            transform: scale(0.7);
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .launch-overlay.active .launch-check {
+            transform: scale(1);
+        }
+
+        .launch-check svg {
+            width: 32px;
+            height: 32px;
+            stroke: #34D399;
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .launch-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .launch-subtitle {
+            font-size: 13.5px;
+            color: #94A3B8;
+            margin-bottom: 18px;
+        }
+
+        .launch-bar-track {
+            width: 240px;
+            height: 5px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            overflow: hidden;
+        }
+
+        .launch-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #1E6BF1, #38BDF8, #10B981);
+            border-radius: 999px;
+            transition: width 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .launch-overlay.active .launch-bar-fill {
+            width: 100%;
+        }
+
+        /* CREDENTIALS HELP MODAL */
+        .help-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px);
+            z-index: 400;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .help-backdrop.open {
+            display: flex;
+            animation: fadeIn 0.2s ease both;
+        }
+
+        .help-modal {
+            width: 100%;
+            max-width: 460px;
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 24px 50px rgba(15, 23, 42, 0.25);
+            animation: cardReveal 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .help-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .help-modal-header h3 {
+            font-size: 16.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .help-close {
+            border: none;
+            background: #F1F5F9;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            color: #475569;
+        }
+
+        .cred-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .cred-table th, .cred-table td {
+            text-align: left;
+            padding: 8px 10px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .cred-table th {
+            background: #F8FAFC;
+            color: #475569;
+            font-weight: 700;
+        }
+
+        .cred-code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            background: #EFF6FF;
+            color: #1D4ED8;
+            padding: 2px 6px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        /* =========================================================
+           KEYFRAMES
+           ========================================================= */
+        @keyframes floatOrb1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(55px, 40px) scale(1.15); }
+        }
+        @keyframes floatOrb2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-45px, -35px) scale(1.18); }
+        }
+        @keyframes floatOrb3 {
+            0% { transform: translate(0, 0) scale(0.95); }
+            100% { transform: translate(-35px, 35px) scale(1.1); }
+        }
+        @keyframes slowSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        @keyframes shimmerGradient {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeSlideDown {
+            from { opacity: 0; transform: translateY(-14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes cardReveal {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes gentleHoverCard {
+            0%, 100% { transform: rotateY(-2deg) rotateX(2deg) translateY(0px); }
+            50% { transform: rotateY(-1deg) rotateX(1deg) translateY(-6px); }
+        }
+        @keyframes shakeX {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .auth-shell {
+                flex-direction: column;
+            }
+            .brand-showcase {
+                padding: 28px 24px;
+            }
+            .preview-stage, .metrics-strip {
+                display: none;
+            }
+            .auth-panel {
+                min-width: unset;
+                padding: 24px 16px 36px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .auth-card {
+                padding: 24px 18px 20px;
+            }
+            .quick-roles-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-shell">
+    <!-- LEFT BRAND & LIVE MOTION PANEL -->
+    <section class="brand-showcase">
+        <div class="aurora-orb orb-1"></div>
+        <div class="aurora-orb orb-2"></div>
+        <div class="aurora-orb orb-3"></div>
+        <canvas id="campusParticlesCanvas"></canvas>
+
+        <div class="showcase-content">
+            <div class="crest-row">
+                <div class="orbital-crest">
+                    <div class="orbital-ring"></div>
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                        <path d="M8 15h3v3H8z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="crest-title">SMART CAMPUS</div>
+                    <div class="crest-subtitle">PIET • Department of Computer Engineering</div>
+                </div>
+            </div>
+
+            <div class="hero-block">
+                <div class="status-pill">
+                    <span class="pulse-dot"></span>
+                    <span>8-Semester CSP Auto-Generator Engine Active</span>
+                </div>
+                <h1 class="hero-heading">
+                    Intelligent Scheduling for <span class="hero-gradient-text">All 8 Semesters.</span>
+                </h1>
+                <p class="hero-desc">
+                    Zero faculty or room double-booking across PIET CSE (<strong style="color:#F8FAFC;">3CSA, 3CSB, 3CSC, 3CSRD</strong> &amp; Sem 1–8),
+                    powered by Constraint Satisfaction auto-resolution and instant batch-split views.
+                </p>
+
+                <!-- FLOATING ANIMATED MINI TIMETABLE PREVIEW -->
+                <div class="preview-stage">
+                    <div class="live-schedule-card" id="livePreviewCard">
+                        <div class="preview-topbar">
+                            <div class="preview-title-group">
+                                <div class="window-dots">
+                                    <span style="background:#EF4444;"></span>
+                                    <span style="background:#F59E0B;"></span>
+                                    <span style="background:#10B981;"></span>
+                                </div>
+                                <span id="previewBannerTitle">Live CSP Sync • Sem 3 (3CSA)</span>
+                            </div>
+                            <span class="preview-badge" id="previewStatusBadge">0 Hard Clashes</span>
+                        </div>
+                        <div class="preview-slots" id="previewSlotsGrid">
+                            <div class="mini-slot active-highlight">
+                                <div class="mini-slot-time">P1 • 08:30 AM</div>
+                                <div class="mini-slot-sub">CS-001 DSA</div>
+                                <div class="mini-slot-meta"><span>Dr. Varsha</span><span>A-202</span></div>
+                            </div>
+                            <div class="mini-slot emerald">
+                                <div class="mini-slot-time">P2 • 09:30 AM</div>
+                                <div class="mini-slot-sub">CS-004 JAVA</div>
+                                <div class="mini-slot-meta"><span>Madhu C.</span><span>A-202</span></div>
+                            </div>
+                            <div class="mini-slot purple">
+                                <div class="mini-slot-time">P6 • 02:00 PM</div>
+                                <div class="mini-slot-sub">CS-002 Lab</div>
+                                <div class="mini-slot-meta"><span>Batch A1</span><span>A-209</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="metrics-strip">
+                    <div class="metric-chip">
+                        <div class="metric-num">Sem 1–8</div>
+                        <div class="metric-lbl">Full Curriculum</div>
+                    </div>
+                    <div class="metric-chip">
+                        <div class="metric-num">19</div>
+                        <div class="metric-lbl">Faculty Members</div>
+                    </div>
+                    <div class="metric-chip">
+                        <div class="metric-num">17</div>
+                        <div class="metric-lbl">Rooms &amp; CS Labs</div>
+                    </div>
+                    <div class="metric-chip">
+                        <div class="metric-num">309</div>
+                        <div class="metric-lbl">III-Sem Excel Cells</div>
+                    </div>
+                </div>
+                <div class="showcase-footer" style="margin-top:16px;">
+                    <span>Poornima Institute of Engineering &amp; Technology (AY 2026–2027)</span>
+                    <span style="color:#38BDF8;font-weight:700;">v1.0.0 • College Edition</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RIGHT AUTHENTICATION CARD -->
+    <section class="auth-panel">
+        <div class="auth-card" id="authCard">
+            <div class="auth-header">
+                <div>
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to access Smart Campus Timetable System</p>
+                </div>
+                <span class="ay-pill">AY 2026-2027</span>
+            </div>
+
+            <!-- ANIMATED ROLE SEGMENTED TABS -->
+            <div class="role-tabs" id="roleTabs">
+                <div class="role-tab-glider" id="roleGlider"></div>
+                <button type="button" class="role-tab-btn active" data-role="ADMIN" data-index="0" onclick="selectRoleTab('ADMIN', 0)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    <span>Admin</span>
+                </button>
+                <button type="button" class="role-tab-btn" data-role="FACULTY" data-index="1" onclick="selectRoleTab('FACULTY', 1)">
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Faculty</span>
+                </button>
+                <button type="button" class="role-tab-btn" data-role="STUDENT" data-index="2" onclick="selectRoleTab('STUDENT', 2)">
+                    <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    <span>Student</span>
+                </button>
+            </div>
+
+            <div class="form-alert" id="loginAlert" role="alert"></div>
+
+            <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+                <div class="field-group">
+                    <label class="field-label" for="usernameInput">
+                        <span id="usernameLabelText">Administrator Email or ID</span>
+                        <span class="field-hint" onclick="fillSelectedRoleDemo()">Auto-fill Demo</span>
+                    </label>
+                    <div class="input-shell">
+                        <svg class="input-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <input class="auth-input" id="usernameInput" type="text" autocomplete="username" placeholder="admin@piet.edu" value="admin@piet.edu" required>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="passwordInput">
+                        <span>Password</span>
+                        <span style="font-weight:500;color:#94A3B8;font-size:11px;" id="passwordHintTag">Demo: admin123</span>
+                    </label>
+                    <div class="input-shell">
+                        <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input class="auth-input" id="passwordInput" type="password" autocomplete="current-password" placeholder="Enter your password" value="admin123" required>
+                        <button type="button" class="eye-toggle" id="eyeToggleBtn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                            <svg id="eyeIconSvg" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="modeSelect">
+                        <span>Target Dataset Workspace</span>
+                    </label>
+                    <div class="input-shell">
+                        <svg class="input-icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                        <select class="auth-select" id="modeSelect">
+                            <option value="MODE_A">Mode A: UI Screenshot Demo Dataset (90 Slots)</option>
+                            <option value="MODE_B">Mode B: PIET Sem 1–8 Master Dataset (309+ Cells)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-options-row">
+                    <label class="remember-label">
+                        <input type="checkbox" id="rememberCheckbox" checked>
+                        <span>Keep me signed in</span>
+                    </label>
+                    <button type="button" class="link-btn" onclick="openHelpModal()">View Demo Credentials</button>
+                </div>
+
+                <button type="submit" class="submit-btn" id="loginSubmitBtn">
+                    <span class="btn-spinner"></span>
+                    <span id="submitBtnText">Sign In to Smart Campus</span>
+                </button>
+            </form>
+
+            <div class="demo-divider">Instant 1-Click Role Access</div>
+
+            <div class="quick-roles-grid">
+                <button type="button" class="quick-role-btn" onclick="quickSignIn('ADMIN', 'admin@piet.edu', 'admin123')">
+                    <div class="role-avatar blue">AD</div>
+                    <div>
+                        <div class="qr-name">System Admin</div>
+                        <div class="qr-meta">Full CSP &amp; CRUD</div>
+                    </div>
+                </button>
+                <button type="button" class="quick-role-btn" onclick="quickSignIn('FACULTY', 'rajesh.verma@piet.edu', 'faculty123')">
+                    <div class="role-avatar cyan">RV</div>
+                    <div>
+                        <div class="qr-name">Dr. Rajesh Verma</div>
+                        <div class="qr-meta">Faculty Schedule</div>
+                    </div>
+                </button>
+                <button type="button" class="quick-role-btn" onclick="quickSignIn('FACULTY', 'kumaridimple@piet.edu', 'faculty123')">
+                    <div class="role-avatar emerald">VK</div>
+                    <div>
+                        <div class="qr-name">Dr. Varsha Kumari</div>
+                        <div class="qr-meta">DSA Faculty View</div>
+                    </div>
+                </button>
+                <button type="button" class="quick-role-btn" onclick="quickSignIn('STUDENT', 'bhaweshs1@piet.edu', 'student123')">
+                    <div class="role-avatar purple">BS</div>
+                    <div>
+                        <div class="qr-name">Bhawesh Sharma</div>
+                        <div class="qr-meta">Student • 3CSA A1</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ANIMATED LAUNCH TRANSITION OVERLAY -->
+<div class="launch-overlay" id="launchOverlay">
+    <div class="launch-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="launch-title" id="launchTitle">Authentication Verified</div>
+    <div class="launch-subtitle" id="launchSubtitle">Loading Smart Campus Timetable Workspace...</div>
+    <div class="launch-bar-track">
+        <div class="launch-bar-fill"></div>
+    </div>
+</div>
+
+<!-- DEMO CREDENTIALS & PASSWORD HELP MODAL -->
+<div class="help-backdrop" id="helpBackdrop" onclick="if (event.target === this) closeHelpModal()">
+    <div class="help-modal">
+        <div class="help-modal-header">
+            <h3>Smart Campus Institutional Credentials</h3>
+            <button type="button" class="help-close" onclick="closeHelpModal()">&times;</button>
+        </div>
+        <p style="font-size:12.5px;color:#475569;line-height:1.55;">
+            Sign in using the demo accounts below, or enter any seeded PIET faculty email/ID (<span class="cred-code">FAC-001</span> .. <span class="cred-code">FAC-019</span>) or student enrollment/email (<span class="cred-code">STU001</span>, <span class="cred-code">25EPIETCS045</span>).
+        </p>
+        <table class="cred-table">
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th>Email / ID</th>
+                    <th>Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Admin</strong></td>
+                    <td><span class="cred-code">admin@piet.edu</span></td>
+                    <td><span class="cred-code">admin123</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Faculty (RV)</strong></td>
+                    <td><span class="cred-code">rajesh.verma@piet.edu</span></td>
+                    <td><span class="cred-code">faculty123</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Faculty (VK)</strong></td>
+                    <td><span class="cred-code">kumaridimple@piet.edu</span></td>
+                    <td><span class="cred-code">faculty123</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Student (3CSA)</strong></td>
+                    <td><span class="cred-code">bhaweshs1@piet.edu</span></td>
+                    <td><span class="cred-code">student123</span></td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0 20px;height:38px;font-size:13px;" onclick="closeHelpModal()">Got It</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ROLE_PRESETS = {
+        ADMIN: {
+            index: 0,
+            label: 'Administrator Email or ID',
+            placeholder: 'admin@piet.edu',
+            demoUser: 'admin@piet.edu',
+            demoPass: 'admin123',
+            hint: 'Demo: admin123'
+        },
+        FACULTY: {
+            index: 1,
+            label: 'Faculty Email or Code (e.g. FAC-001)',
+            placeholder: 'rajesh.verma@piet.edu',
+            demoUser: 'rajesh.verma@piet.edu',
+            demoPass: 'faculty123',
+            hint: 'Demo: faculty123'
+        },
+        STUDENT: {
+            index: 2,
+            label: 'Student Email or Enrollment No.',
+            placeholder: 'bhaweshs1@piet.edu or STU003',
+            demoUser: 'bhaweshs1@piet.edu',
+            demoPass: 'student123',
+            hint: 'Demo: student123'
+        }
+    };
+
+    const PREVIEW_SCENES = [
+        {
+            banner: 'Live CSP Sync • Sem 3 (3CSA)',
+            badge: '0 Hard Clashes',
+            slots: [
+                { time: 'P1 • 08:30 AM', sub: 'CS-001 DSA', a: 'Dr. Varsha', b: 'A-202', cls: 'active-highlight' },
+                { time: 'P2 • 09:30 AM', sub: 'CS-004 JAVA', a: 'Madhu C.', b: 'A-202', cls: 'emerald' },
+                { time: 'P6 • 02:00 PM', sub: 'CS-002 Lab', a: 'Batch A1', b: 'A-209', cls: 'purple' }
+            ]
+        },
+        {
+            banner: 'All 8 Semesters • Auto-Generator',
+            badge: '228 Verified Slots',
+            slots: [
+                { time: 'Sem 1 • 1CSA', sub: '1FY2-01 Math', a: 'OP Sikhwal', b: 'C-208', cls: 'emerald' },
+                { time: 'Sem 6 • 6CSA', sub: '6CS4-02 ML', a: 'Garima S.', b: 'C-308', cls: 'active-highlight' },
+                { time: 'Sem 8 • 8CSA', sub: '8CS7-50 FYP', a: 'Dr. Anil P.', b: 'SH01', cls: 'purple' }
+            ]
+        },
+        {
+            banner: 'PIET Daily Master • Oct 5–9, 2026',
+            badge: '309 Master Cells',
+            slots: [
+                { time: '3CSB • P3', sub: '253CS4-06 SE', a: 'Dr. Rajesh', b: 'C-201', cls: '' },
+                { time: '3CSC • P4', sub: '253CS4-03 DE', a: 'Priyanka G.', b: 'C-202', cls: 'emerald' },
+                { time: '3CSRD • P5', sub: '253CR4-08 UI/UX', a: 'Udbhav O.', b: 'A-203', cls: 'active-highlight' }
+            ]
+        }
+    ];
+
+    let activeRoleCategory = 'ADMIN';
+    let sceneIdx = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+        initParticlesCanvas();
+        startPreviewCycle();
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('loggedOut') === '1') {
+            showAlert('You have been signed out cleanly. Sign in below to continue.', 'info');
+        }
+        const savedMode = localStorage.getItem('smartcampus_preferred_mode');
+        if (savedMode === 'MODE_A' || savedMode === 'MODE_B') {
+            document.getElementById('modeSelect').value = savedMode;
+        }
+    });
+
+    function selectRoleTab(roleCat, index) {
+        activeRoleCategory = roleCat;
+        const glider = document.getElementById('roleGlider');
+        glider.style.transform = `translateX(${index * 100}%)`;
+
+        document.querySelectorAll('.role-tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.role === roleCat);
+        });
+
+        const preset = ROLE_PRESETS[roleCat] || ROLE_PRESETS.ADMIN;
+        document.getElementById('usernameLabelText').textContent = preset.label;
+        document.getElementById('usernameInput').placeholder = preset.placeholder;
+        document.getElementById('usernameInput').value = preset.demoUser;
+        document.getElementById('passwordInput').value = preset.demoPass;
+        document.getElementById('passwordHintTag').textContent = preset.hint;
+        hideAlert();
+    }
+
+    function fillSelectedRoleDemo() {
+        const preset = ROLE_PRESETS[activeRoleCategory] || ROLE_PRESETS.ADMIN;
+        document.getElementById('usernameInput').value = preset.demoUser;
+        document.getElementById('passwordInput').value = preset.demoPass;
+        document.getElementById('usernameInput').focus();
+        showAlert(`Filled verified ${activeRoleCategory} demo credentials.`, 'info');
+    }
+
+    function togglePasswordVisibility() {
+        const inp = document.getElementById('passwordInput');
+        const svg = document.getElementById('eyeIconSvg');
+        if (inp.type === 'password') {
+            inp.type = 'text';
+            svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+        } else {
+            inp.type = 'password';
+            svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        }
+    }
+
+    async function quickSignIn(roleCat, username, password) {
+        const preset = ROLE_PRESETS[roleCat] || ROLE_PRESETS.ADMIN;
+        selectRoleTab(roleCat, preset.index);
+        document.getElementById('usernameInput').value = username;
+        document.getElementById('passwordInput').value = password;
+        await performLogin(roleCat, username, password);
+    }
+
+    async function handleLoginSubmit(event) {
+        event.preventDefault();
+        const username = document.getElementById('usernameInput').value.trim();
+        const password = document.getElementById('passwordInput').value;
+        await performLogin(activeRoleCategory, username, password);
+    }
+
+    async function performLogin(roleCategory, username, password) {
+        const btn = document.getElementById('loginSubmitBtn');
+        const btnTxt = document.getElementById('submitBtnText');
+        const mode = document.getElementById('modeSelect').value;
+        const remember = document.getElementById('rememberCheckbox').checked;
+
+        if (!username || !password) {
+            triggerCardShake('Please enter both your Institutional ID/Email and Password.');
+            return;
+        }
+
+        hideAlert();
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btnTxt.textContent = 'Verifying Credentials...';
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username,
+                    password,
+                    roleCategory,
+                    mode
+                })
+            });
+
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.authenticated) {
+                throw new Error(data.error || 'Invalid credentials. Check ID and password.');
+            }
+
+            const sessionObj = {
+                token: data.token || ('sc-' + Date.now()),
+                role: data.role || 'ADMIN',
+                roleCategory: data.roleCategory || roleCategory,
+                displayName: data.displayName || 'System Administrator',
+                email: data.email || username,
+                userCode: data.userCode || '',
+                facultyName: data.facultyName || '',
+                studentSection: data.studentSection || '3CSA',
+                studentBatch: data.studentBatch || 'A1',
+                mode: data.mode || mode,
+                loggedInAt: new Date().toISOString()
+            };
+
+            const serialized = JSON.stringify(sessionObj);
+            sessionStorage.setItem('smartcampus_auth', serialized);
+            localStorage.setItem('smartcampus_preferred_mode', sessionObj.mode);
+            if (remember) {
+                localStorage.setItem('smartcampus_auth', serialized);
+            } else {
+                localStorage.removeItem('smartcampus_auth');
+            }
+
+            // Show animated launch transition overlay
+            document.getElementById('launchTitle').textContent = `Welcome, ${sessionObj.displayName}`;
+            document.getElementById('launchSubtitle').textContent = `Entering ${sessionObj.mode === 'MODE_B' ? 'PIET Sem 1–8 Master Workspace' : 'UI Demo Workspace'}...`;
+            document.getElementById('launchOverlay').classList.add('active');
+
+            const params = new URLSearchParams(window.location.search);
+            const targetUrl = params.get('redirect') && params.get('redirect').startsWith('/')
+                && !params.get('redirect').startsWith('/login')
+                ? params.get('redirect')
+                : '/dashboard';
+
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 780);
+        } catch (err) {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btnTxt.textContent = 'Sign In to Smart Campus';
+            triggerCardShake(err.message || 'Authentication failed.');
+        }
+    }
+
+    function triggerCardShake(message) {
+        showAlert(message, 'error');
+        const card = document.getElementById('authCard');
+        card.classList.remove('shake');
+        void card.offsetWidth;
+        card.classList.add('shake');
+    }
+
+    function showAlert(msg, kind) {
+        const el = document.getElementById('loginAlert');
+        el.className = 'form-alert ' + (kind === 'info' ? 'info' : 'error');
+        el.textContent = msg;
+    }
+
+    function hideAlert() {
+        const el = document.getElementById('loginAlert');
+        el.className = 'form-alert';
+        el.textContent = '';
+    }
+
+    function openHelpModal() {
+        document.getElementById('helpBackdrop').classList.add('open');
+    }
+
+    function closeHelpModal() {
+        document.getElementById('helpBackdrop').classList.remove('open');
+    }
+
+    function startPreviewCycle() {
+        setInterval(() => {
+            sceneIdx = (sceneIdx + 1) % PREVIEW_SCENES.length;
+            const scene = PREVIEW_SCENES[sceneIdx];
+            const bannerEl = document.getElementById('previewBannerTitle');
+            const badgeEl = document.getElementById('previewStatusBadge');
+            const gridEl = document.getElementById('previewSlotsGrid');
+            if (!bannerEl || !badgeEl || !gridEl) return;
+
+            bannerEl.textContent = scene.banner;
+            badgeEl.textContent = scene.badge;
+            gridEl.innerHTML = scene.slots.map(s => `
+                <div class="mini-slot ${s.cls}">
+                    <div class="mini-slot-time">${s.time}</div>
+                    <div class="mini-slot-sub">${s.sub}</div>
+                    <div class="mini-slot-meta"><span>${s.a}</span><span>${s.b}</span></div>
+                </div>
+            `).join('');
+        }, 3600);
+    }
+
+    function initParticlesCanvas() {
+        const canvas = document.getElementById('campusParticlesCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let width = 0, height = 0;
+        const mouse = { x: null, y: null };
+        const particles = [];
+        const count = 42;
+
+        function resize() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            width = canvas.width = Math.max(300, rect.width);
+            height = canvas.height = Math.max(300, rect.height);
+        }
+
+        resize();
+        window.addEventListener('resize', resize);
+
+        canvas.parentElement.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        });
+        canvas.parentElement.addEventListener('mouseleave', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.45,
+                vy: (Math.random() - 0.5) * 0.45,
+                r: 1.5 + Math.random() * 2.1
+            });
+        }
+
+        function tick() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                if (!reduceMotion) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(96, 165, 250, 0.55)';
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const q = particles[j];
+                    const dx = p.x - q.x;
+                    const dy = p.y - q.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < 130) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(q.x, q.y);
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${(1 - dist / 130) * 0.22})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+
+                if (mouse.x !== null) {
+                    const mdx = p.x - mouse.x;
+                    const mdy = p.y - mouse.y;
+                    const mdist = Math.hypot(mdx, mdy);
+                    if (mdist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.strokeStyle = `rgba(16, 185, 129, ${(1 - mdist / 150) * 0.35})`;
+                        ctx.lineWidth = 1.1;
+                        ctx.stroke();
+                    }
+                }
+            }
+            if (!reduceMotion) {
+                requestAnimationFrame(tick);
+            }
+        }
+        tick();
+    }
+</script>
+</body>
+</html>
